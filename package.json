@@ -1,0 +1,81 @@
+{
+  "name": "editor",
+  "version": "2.0.42-SNAPSHOT",
+  "homepage": "./",
+  "license": "MIT",
+  "dependencies": {
+    "@ant-design/cssinjs": "1.21.1",
+    "@ant-design/icons": "5.5.1",
+    "@codemirror/lang-markdown": "6.3.3",
+    "@codemirror/language-data": "6.5.1",
+    "@craco/craco": "7.1.0",
+    "@fortawesome/fontawesome-svg-core": "6.6.0",
+    "@fortawesome/free-solid-svg-icons": "6.6.0",
+    "@uiw/react-codemirror": "4.24.1",
+    "antd": "6.0.1",
+    "axios": "1.12.0",
+    "flowchart.js": "1.18.0",
+    "highlight.js": "11.11.1",
+    "katex": "0.16.22",
+    "marked": "16.0.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-router": "6.28.0",
+    "react-router-dom": "6.28.0",
+    "react-sequence-diagram": "0.0.12",
+    "screenfull": "6.0.2",
+    "styled-components": "6.1.15"
+  },
+  "scripts": {
+    "lint": "yarn type-check",
+    "start": "craco start",
+    "type-check": "tsc --project tsconfig.json --pretty --noEmit",
+    "build": "tsc",
+    "pages": "craco build",
+    "test": "craco test"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "devDependencies": {
+    "@types/katex": "0.16.7",
+    "@types/react": "18.3.12",
+    "@types/react-dom": "18.3.1",
+    "@types/react-router": "5.1.20",
+    "@types/react-router-dom": "5.3.3",
+    "@typescript-eslint/typescript-estree": "8.38.0",
+    "cross-env": "7.0.3",
+    "husky": "7.0.4",
+    "lint-staged": "11.1.2",
+    "node": "18.9.0",
+    "prettier": "2.3.2",
+    "react-scripts": "5.0.1",
+    "typescript": "5.8.3"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "lint-staged": {
+    "*.tsx": [
+      "prettier --write",
+      "eslint --fix --max-warnings=0",
+      "git add"
+    ]
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "package.json",
+    "editor-changelog.md"
+  ],
+  "main": "dist/editor/marked-editor"
+}
