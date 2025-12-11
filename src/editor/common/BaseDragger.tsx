@@ -8,7 +8,6 @@ type BaseDraggerProps = PropsWithChildren & {
     style?: CSSProperties;
     height?: number;
     accept?: string;
-    name: string;
     onSuccess?: (data: DraggerUploadResponse) => void;
     onProgress?: (percent: number) => void;
     disabled?: boolean;
@@ -21,7 +20,6 @@ const BaseDragger: FunctionComponent<BaseDraggerProps> = ({
                                                               children,
                                                               style,
                                                               accept,
-                                                              name,
                                                               onSuccess,
                                                               disabled,
                                                               onProgress,
@@ -35,7 +33,7 @@ const BaseDragger: FunctionComponent<BaseDraggerProps> = ({
         const {file} = options;
 
         const formData = new FormData();
-        formData.append(name, file);
+        formData.append(uploadConfig.formName, file);
 
         if (uploadConfig.axiosInstance) {
             try {
