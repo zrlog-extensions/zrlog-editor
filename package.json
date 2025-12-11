@@ -1,6 +1,6 @@
 {
   "name": "editor",
-  "version": "2.0.44-SNAPSHOT",
+  "version": "2.0.44",
   "homepage": "./",
   "license": "MIT",
   "dependencies": {
