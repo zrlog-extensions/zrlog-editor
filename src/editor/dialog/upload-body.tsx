@@ -89,7 +89,6 @@ const UploadBody: FunctionComponent<UploadBodyProps> = ({type, onChange, uploadC
                     style={{flex: "100%", minWidth: 96, padding: 0, display: "flex", alignItems: "center"}}
                     height={36}
                     type={type}
-                    name={uploadConfig.formName}
                     disabled={state.uploading}
                     onError={(e) => {
                         messageApi.error(e.message);
