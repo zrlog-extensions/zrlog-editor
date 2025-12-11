@@ -8,19 +8,18 @@ type BaseDraggerProps = PropsWithChildren & {
     style?: CSSProperties;
     height?: number;
     accept?: string;
-    action: string;
     name: string;
     onSuccess?: (data: DraggerUploadResponse) => void;
     onProgress?: (percent: number) => void;
     disabled?: boolean;
     onError?: (error: Error) => void;
     uploadConfig: UploadConfig;
+    type: string;
 };
 
 const BaseDragger: FunctionComponent<BaseDraggerProps> = ({
                                                               children,
                                                               style,
-                                                              action,
                                                               accept,
                                                               name,
                                                               onSuccess,
@@ -28,7 +27,8 @@ const BaseDragger: FunctionComponent<BaseDraggerProps> = ({
                                                               onProgress,
                                                               onError,
                                                               uploadConfig,
-                                                              height
+                                                              height,
+                                                              type
                                                           }) => {
 
     const customRequest = async (options: any) => {
@@ -39,7 +39,7 @@ const BaseDragger: FunctionComponent<BaseDraggerProps> = ({
 
         if (uploadConfig.axiosInstance) {
             try {
-                const {data} = await uploadConfig.axiosInstance.post(action, formData, {
+                const {data} = await uploadConfig.axiosInstance.post(uploadConfig.buildUploadUrl(type), formData, {
                     headers: {
                         "Content-Type": "multipart/form-data",
                     },
