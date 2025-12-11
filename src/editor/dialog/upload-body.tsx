@@ -118,7 +118,7 @@ const UploadBody: FunctionComponent<UploadBodyProps> = ({type, onChange, uploadC
                         });
                     }}
                 >
-                    {state.uploading && <LoadingOutlined style={{paddingRight: 8}}/>}
+                    {state.uploading && <LoadingOutlined style={{marginRight: 8}}/>}
                     {state.uploading ? getEditorRes("uploading") : getEditorRes("localUpload")}
                 </BaseDragger>
             </div>
