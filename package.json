@@ -1,6 +1,6 @@
 {
   "name": "editor",
-  "version": "2.0.42-SNAPSHOT",
+  "version": "2.0.42",
   "homepage": "./",
   "license": "MIT",
   "dependencies": {
@@ -9,8 +9,6 @@
     "@codemirror/lang-markdown": "6.3.3",
     "@codemirror/language-data": "6.5.1",
     "@craco/craco": "7.1.0",
-    "@fortawesome/fontawesome-svg-core": "6.6.0",
-    "@fortawesome/free-solid-svg-icons": "6.6.0",
     "@uiw/react-codemirror": "4.24.1",
     "antd": "6.0.1",
     "axios": "1.12.0",

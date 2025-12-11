@@ -1,0 +1,6 @@
+import React from 'react';
+import type { SVGProps } from 'react';
+
+export function Fa7SolidMinus(props: SVGProps<SVGSVGElement>) {
+	return (<svg xmlns="http://www.w3.org/2000/svg" width={640} height={640} viewBox="0 0 640 640" {...props}><path fill="currentColor" d="M96 320c0-17.7 14.3-32 32-32h384c17.7 0 32 14.3 32 32s-14.3 32-32 32H128c-17.7 0-32-14.3-32-32"></path></svg>);
+}
