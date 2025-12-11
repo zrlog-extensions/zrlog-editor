@@ -1,64 +1,11 @@
-// Add the icons to the library so you can use it in your page
-import { dom, library } from "@fortawesome/fontawesome-svg-core";
-import {
-    fa2,
-    fa3,
-    fa4,
-    faBold,
-    faClipboard,
-    faClose,
-    faEye,
-    faEyeSlash,
-    faFileCode,
-    faFileVideo,
-    faImage,
-    faInfoCircle,
-    faItalic,
-    faLink,
-    faListOl,
-    faListUl,
-    faMinus,
-    faPaperclip,
-    faPhotoFilm,
-    faQuestionCircle,
-    faQuoteLeft,
-    faStrikethrough,
-    faTable,
-} from "@fortawesome/free-solid-svg-icons";
+import {FunctionComponent, PropsWithChildren} from "react";
 
-const icons = [
-    faBold,
-    faStrikethrough,
-    fa4,
-    faItalic,
-    faQuoteLeft,
-    faListUl,
-    faListOl,
-    faMinus,
-    faQuestionCircle,
-    faInfoCircle,
-    faClipboard,
-    faTable,
-    faFileCode,
-    faPaperclip,
-    faFileVideo,
-    fa3,
-    fa2,
-    faImage,
-    faPhotoFilm,
-    faLink,
-    faClose,
-    faEyeSlash,
-    faEye,
-];
-icons.forEach((e) => {
-    library.add(e);
-});
+type EditorIconProps = PropsWithChildren & {
+    onClick?: () => void;
+    title?: string
+}
 
-// This will replace any existing `<i>` elements with `<svg>` and set up a MutationObserver to continue doing this as the DOM changes.
-dom.watch();
-
-const EditorIcon = ({ name, onClick, title }: { name: string; onClick?: () => void; title?: string }) => {
+const EditorIcon: FunctionComponent<EditorIconProps> = ({onClick, title, children}) => {
     return (
         <div
             title={title}
@@ -70,13 +17,13 @@ const EditorIcon = ({ name, onClick, title }: { name: string; onClick?: () => vo
                 display: "flex",
                 alignItems: "center",
                 color: "rgb(119, 119, 119)",
-                fontSize: 16,
+                fontSize: 20,
                 height: 38,
                 borderRadius: 6,
                 justifyContent: "center",
             }}
         >
-            <i className={"fa fa-" + name}></i>
+            {children}
         </div>
     );
 };

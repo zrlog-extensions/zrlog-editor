@@ -6,6 +6,9 @@ import {getBgColor} from "./editor-helpers";
 import {EditorToolBarDivider} from "./editor-tool-bar";
 import {AIConfig} from "./editor.types";
 import {AxiosInstance} from "axios";
+import {Fa7SolidBold} from "./icons/Fa7SolidBold";
+import {Fa7SolidStrikethrough} from "./icons/Fa7SolidStrikethrough";
+import {Fa7SolidItalic} from "./icons/Fa7SolidItalic";
 
 export interface SelectionToolbarProps {
     visible: boolean;
@@ -56,9 +59,15 @@ export const SelectionToolbar: React.FC<SelectionToolbarProps> = ({
             // 避免点击时让编辑器失焦 / 选区消失
             onMouseDown={(e) => e.preventDefault()}
         >
-            <EditorIcon name={"bold"} onClick={onBold}/>
-            <EditorIcon name={"strikethrough"} onClick={onStrikethrough}/>
-            <EditorIcon name={"italic"} onClick={onItalic}/>
+            <EditorIcon onClick={onBold}>
+                <Fa7SolidBold/>
+            </EditorIcon>
+            <EditorIcon onClick={onStrikethrough}>
+                <Fa7SolidStrikethrough/>
+            </EditorIcon>
+            <EditorIcon onClick={onItalic}>
+                <Fa7SolidItalic/>
+            </EditorIcon>
             <EditorToolBarDivider dark={dark}/>
             {aiConfig && <AIButton
                 drawerWidth={aiConfig.drawerWidth}
@@ -81,22 +90,9 @@ export const SelectionToolbar: React.FC<SelectionToolbarProps> = ({
                     }
                 }}
             >
-                <div
-                    className={"editor-icon"}
-                    style={{
-                        cursor: "pointer",
-                        minWidth: 34,
-                        display: "flex",
-                        alignItems: "center",
-                        color: "rgb(119, 119, 119)",
-                        fontSize: 16,
-                        height: 38,
-                        borderRadius: 6,
-                        justifyContent: "center",
-                    }}
-                >
+                <EditorIcon>
                     <AIIcon name={aiConfig.aiProvider}/>
-                </div>
+                </EditorIcon>
             </AIButton>}
         </div>
     );

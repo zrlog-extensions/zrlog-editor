@@ -1,6 +1,8 @@
-import React from 'react';
-import type { SVGProps } from 'react';
+import type {SVGProps} from 'react';
 
 export function Fa7SolidTable(props: SVGProps<SVGSVGElement>) {
-	return (<svg xmlns="http://www.w3.org/2000/svg" width={640} height={640} viewBox="0 0 640 640" {...props}><path fill="currentColor" d="M352 224v96h128v-96zm-64 0H160v96h128zM96 384V160c0-35.3 28.7-64 64-64h320c35.3 0 64 28.7 64 64v320c0 35.3-28.7 64-64 64H160c-35.3 0-64-28.7-64-64zm384 0H352v96h128zm-192 96v-96H160v96z"></path></svg>);
+    return (<svg xmlns="http://www.w3.org/2000/svg" width={"1em"} height={"1em"} viewBox="0 0 640 640" {...props}>
+        <path fill="currentColor"
+              d="M352 224v96h128v-96zm-64 0H160v96h128zM96 384V160c0-35.3 28.7-64 64-64h320c35.3 0 64 28.7 64 64v320c0 35.3-28.7 64-64 64H160c-35.3 0-64-28.7-64-64zm384 0H352v96h128zm-192 96v-96H160v96z"></path>
+    </svg>);
 }

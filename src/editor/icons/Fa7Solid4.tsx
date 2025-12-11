@@ -1,6 +1,8 @@
-import React from 'react';
-import type { SVGProps } from 'react';
+import type {SVGProps} from 'react';
 
 export function Fa7Solid4(props: SVGProps<SVGSVGElement>) {
-	return (<svg xmlns="http://www.w3.org/2000/svg" width={640} height={640} viewBox="0 0 640 640" {...props}><path fill="currentColor" d="M192 128c0-17.7-14.3-32-32-32s-32 14.3-32 32v224c0 35.3 28.7 64 64 64h192v96c0 17.7 14.3 32 32 32s32-14.3 32-32v-96h32c17.7 0 32-14.3 32-32s-14.3-32-32-32h-32V128c0-17.7-14.3-32-32-32s-32 14.3-32 32v224H192z"></path></svg>);
+    return (<svg xmlns="http://www.w3.org/2000/svg" width={"1em"} height={"1em"} viewBox="0 0 640 640" {...props}>
+        <path fill="currentColor"
+              d="M192 128c0-17.7-14.3-32-32-32s-32 14.3-32 32v224c0 35.3 28.7 64 64 64h192v96c0 17.7 14.3 32 32 32s32-14.3 32-32v-96h32c17.7 0 32-14.3 32-32s-14.3-32-32-32h-32V128c0-17.7-14.3-32-32-32s-32 14.3-32 32v224H192z"></path>
+    </svg>);
 }
