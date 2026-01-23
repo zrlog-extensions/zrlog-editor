@@ -52,6 +52,8 @@ export type EditorConfig = {
     colorPrimary?: string;
     dark: boolean;
     lang: Locale;
+    disableToolbar?: boolean;
+    disableStatistics?: boolean;
     preview: boolean;
     onPreviewChange?: (preview: boolean) => void;
     uploadConfig: UploadConfig;

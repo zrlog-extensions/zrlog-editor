@@ -9,6 +9,7 @@ import {FunctionComponent, useState} from "react";
 import axios from "axios";
 import Title from "antd/es/typography/Title";
 import HtmlPreviewPanel from "../editor/html-preview-panel";
+import {EditorConfig} from "../editor/editor.types";
 
 type TestMarkdownEditorProps = {
     dark: boolean
@@ -44,6 +45,32 @@ const HomePage: FunctionComponent<TestMarkdownEditorProps> = ({dark}) => {
 
     const [value, setValue] = useState<string>(markdown);
 
+    const editorConfig = {
+        disableToolbar: false,
+        disableStatistics: false,
+        dark: dark,
+        preview: true,
+        lang: lang,
+        aiConfig: {
+            drawerWidth: 1024,
+            aiProvider: AIProviderType.DEEP_SEEK,
+            sessionId: 0,
+            aiApiUri: "/api/ai",
+            subject: "Markdown Editor",
+            user: {
+                avatarUrl: "https://www.zrlog.com/favicon.svg",
+                nickname: "test"
+            }
+        },
+        uploadConfig: {
+            buildUploadUrl: (type) => {
+                return `/api/${type}`;
+            },
+            axiosInstance: axios.create(),
+            formName: "imgFile"
+        }
+    } as EditorConfig
+
     return <Layout style={{height: "100vh", padding: 16}}>
         <Title level={2} style={{textAlign: "center", paddingBottom: 32}}>Markdown Editor</Title>
         <Card title={""} styles={{
@@ -56,36 +83,15 @@ const HomePage: FunctionComponent<TestMarkdownEditorProps> = ({dark}) => {
             }} fullscreen={false} value={markdown}
                           axiosInstance={axios.create()}
                           content={marked(markdown) as string}
-                          config={{
-                              dark: dark,
-                              preview: true,
-                              lang: lang,
-                              aiConfig: {
-                                  drawerWidth: 1024,
-                                  aiProvider: AIProviderType.DEEP_SEEK,
-                                  sessionId: 0,
-                                  aiApiUri: "/api/ai",
-                                  subject: "Markdown Editor",
-                                  user: {
-                                      avatarUrl: "https://www.zrlog.com/favicon.svg",
-                                      nickname: "test"
-                                  }
-                              },
-                              uploadConfig: {
-                                  buildUploadUrl: (type) => {
-                                      return `/api/${type}`;
-                                  },
-                                  axiosInstance: axios.create(),
-                                  formName: "imgFile"
-                              }
-                          }}
+                          config={editorConfig}
 
             />
 
-            <EditorStatistics data={
+            {!editorConfig.disableStatistics && <EditorStatistics data={
                 toStatisticsByMarkdown(value)
             } offline={false} rubbish={false} lastUpdateDate={new Date().getTime()}
-                              dark={dark}/>
+                                                                  dark={dark}/>
+            }
         </Card>
         <div style={{textAlign: "center", paddingTop: 24}}>
             Made with ❤️ by ZrLog Team

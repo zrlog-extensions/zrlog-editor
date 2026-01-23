@@ -222,7 +222,7 @@ const MarkedEditor: FunctionComponent<MarkdownEditorProps> = ({
 
     return (
         <StyledEditor mainColor={config.colorPrimary ? config.colorPrimary : ""} dark={config.dark}
-                      style={{paddingBottom: 30}}>
+                      style={{paddingBottom: config.disableStatistics ? 0 : 30}}>
             {editorRef.current && (
                 <PasteUpload
                     uploadFormName={config.uploadConfig.formName}
@@ -257,7 +257,7 @@ const MarkedEditor: FunctionComponent<MarkdownEditorProps> = ({
             )}
             <div className={config.dark ? "editor-dark" : "editor-light"} style={{overflow: "hidden"}}>
                 {contextHolder}
-                <EditorToolBar
+                {!config.disableToolbar && <EditorToolBar
                     uploadConfig={config.uploadConfig}
                     axiosInstance={axiosInstance}
                     dark={config.dark}
@@ -281,8 +281,9 @@ const MarkedEditor: FunctionComponent<MarkdownEditorProps> = ({
                     }}
                     preview={state.preview}
                 />
+                }
                 <div style={{height: height, display: "flex", width: "100%"}}>
-                    <SelectionToolbar
+                    {!config.disableToolbar && <SelectionToolbar
                         axiosInstance={axiosInstance}
                         dark={config.dark}
                         visible={toolbar.visible}
@@ -298,6 +299,7 @@ const MarkedEditor: FunctionComponent<MarkdownEditorProps> = ({
                         }}
                         aiConfig={config.aiConfig}
                     />
+                    }
                     <CodeMirror
                         basicSetup={{searchKeymap: true}}
                         placeholder={placeholder}
