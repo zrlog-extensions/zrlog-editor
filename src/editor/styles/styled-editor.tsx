@@ -1,10 +1,7 @@
 import styled from "styled-components";
 import {getBorderColor} from "../editor-helpers";
-import {theme} from "antd";
 
 export const StyledEditor = styled("div")<{ mainColor: string, dark: boolean }>(({mainColor, dark}) => {
-
-    const {token} = theme.useToken();
 
     return {
         ".cm-editor.cm-focused": {
@@ -65,7 +62,7 @@ export const StyledEditor = styled("div")<{ mainColor: string, dark: boolean }>(
             height: 26,
             borderRadius: 4,
         },
-        ".editor-dark .cm-content": {backgroundColor: token.colorBgContainer},
+        ".editor-dark .cm-content": {backgroundColor: "#141414"},
         ".editor-dark .cm-scroller": {backgroundColor: "#141414"},
         ".editor-dark .cm-gutters": {backgroundColor: "#1f1f1f"},
         ".editor-dark .cm-panel": {
