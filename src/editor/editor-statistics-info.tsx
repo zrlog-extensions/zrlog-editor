@@ -39,7 +39,6 @@ const EditorStatistics: FunctionComponent<EditorStatisticsInfoProps> = ({
                 fontSize: 14,
                 bottom: 0,
                 userSelect: "none",
-                background: dark ? "#141414" : "white",
                 justifyContent: "space-around",
             }}
         >
