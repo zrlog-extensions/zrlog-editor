@@ -62,8 +62,7 @@ export const StyledEditor = styled("div")<{ mainColor: string, dark: boolean }>(
             height: 26,
             borderRadius: 4,
         },
-        ".editor-dark .cm-content": {backgroundColor: "#1d1d1d"},
-        ".editor-dark .cm-scroller": {backgroundColor: "#141414"},
+        ".editor-dark .cm-scroller": {backgroundColor: "#1d1d1d"},
         ".editor-dark .cm-gutters": {backgroundColor: "#1f1f1f"},
         ".editor-dark .cm-panel": {
             backgroundColor: "#1f1f1f",
