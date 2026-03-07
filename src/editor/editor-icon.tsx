@@ -25,7 +25,6 @@ const EditorIcon: FunctionComponent<EditorIconProps> = ({onClick, title, childre
                 borderRadius: 0,
                 padding: 0,
                 justifyContent: "center",
-                background: "initial",
             }}
         >
         </Button>
