@@ -15,7 +15,7 @@ const EditorIcon: FunctionComponent<EditorIconProps> = ({onClick, title, childre
             onClick={onClick}
             type={"text"}
             style={{
-                minWidth: 34,
+                width: 38,
                 display: "flex",
                 alignItems: "center",
                 fontSize: 20,
