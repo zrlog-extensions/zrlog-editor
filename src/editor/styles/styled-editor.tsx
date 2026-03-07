@@ -9,8 +9,7 @@ export const StyledEditor = styled("div")<{ mainColor: string, dark: boolean }>(
             boxShadow: "none !important",
         },
         ".editor-icon:hover": {
-            borderRadius: 2,
-            color: `${mainColor} !important`,
+            color: `${mainColor}!important`,
             background: `${getBorderColor(dark)}`,
         },
         ".preview": {

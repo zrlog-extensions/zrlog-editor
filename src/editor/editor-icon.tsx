@@ -1,4 +1,5 @@
 import {FunctionComponent, PropsWithChildren} from "react";
+import {Button} from "antd";
 
 type EditorIconProps = PropsWithChildren & {
     onClick?: () => void;
@@ -7,24 +8,24 @@ type EditorIconProps = PropsWithChildren & {
 
 const EditorIcon: FunctionComponent<EditorIconProps> = ({onClick, title, children}) => {
     return (
-        <div
+        <Button
             title={title}
             onClick={onClick}
             className={"editor-icon"}
             style={{
-                cursor: "pointer",
                 minWidth: 34,
                 display: "flex",
                 alignItems: "center",
                 color: "rgb(119, 119, 119)",
-                fontSize: 20,
+                border: "none",
                 height: 38,
-                borderRadius: 6,
+                borderRadius: 0,
+                padding: 0,
                 justifyContent: "center",
             }}
         >
             {children}
-        </div>
+        </Button>
     );
 };
 export default EditorIcon;
