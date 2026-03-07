@@ -101,7 +101,6 @@ const EditorToolBar: FunctionComponent<EditorToolBarProps> = ({
             <div
                 style={{
                     display: "flex",
-                    gap: 2,
                     paddingRight: 8,
                     flexWrap: "wrap",
                     paddingLeft: 8,
