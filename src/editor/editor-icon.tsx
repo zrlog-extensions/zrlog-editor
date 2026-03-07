@@ -16,12 +16,13 @@ const EditorIcon: FunctionComponent<EditorIconProps> = ({onClick, title, childre
                 minWidth: 34,
                 display: "flex",
                 alignItems: "center",
-                color: "rgb(119, 119, 119)",
+                fontSize: 20,
                 border: "none",
                 height: 38,
                 borderRadius: 0,
                 padding: 0,
                 justifyContent: "center",
+                background: "initial",
             }}
         >
             {children}
