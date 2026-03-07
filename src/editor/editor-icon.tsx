@@ -1,15 +1,27 @@
 import {FunctionComponent, PropsWithChildren} from "react";
 import {Button} from "antd";
+import {IconWrapperProps} from "antd/es/button/IconWrapper";
 
 type EditorIconProps = PropsWithChildren & {
     onClick?: () => void;
     title?: string
 }
 
+const IconWrapper = ({children, ...props}: IconWrapperProps) => (
+    <span
+        role="img"
+        className="anticon" // 关键：加入这个类名可以继承 Antd 的图标基础样式
+        {...props}
+    >
+    {children}
+  </span>
+);
+
 const EditorIcon: FunctionComponent<EditorIconProps> = ({onClick, title, children}) => {
     return (
         <Button
             title={title}
+            icon={<IconWrapper prefixCls={""}>{children}</IconWrapper>}
             onClick={onClick}
             type={"text"}
             style={{
@@ -26,7 +38,6 @@ const EditorIcon: FunctionComponent<EditorIconProps> = ({onClick, title, childre
                 background: "initial",
             }}
         >
-            {children}
         </Button>
     );
 };
