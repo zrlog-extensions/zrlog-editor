@@ -342,7 +342,7 @@ const MarkedEditor: FunctionComponent<MarkdownEditorProps> = ({
                     />
                     {state.preview && <>
                         <Divider vertical={true}
-                                 style={{padding: 0, margin: 0, borderWidth: 1, height: "100%", overflow: "hidden"}}/>
+                                 style={{padding: 0, margin: 0, height: "100%", overflow: "hidden"}}/>
                         <HtmlPreviewPanel
                             dark={config.dark}
                             previewRef={previewRef}
