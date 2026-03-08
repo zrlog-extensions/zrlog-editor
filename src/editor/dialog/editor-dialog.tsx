@@ -102,6 +102,9 @@ const EditorDialog: FunctionComponent<EditorDialogProps> = ({
             title={title}
             onOk={() => {
                 if (type === "help") {
+                    if (onClose) {
+                        onClose();
+                    }
                     return;
                 }
                 if (onOk) {
