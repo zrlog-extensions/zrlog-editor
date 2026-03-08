@@ -46,7 +46,7 @@ type EditorToolBarDividerProps = {
 export const EditorToolBarDivider: FunctionComponent<EditorToolBarDividerProps> = ({style}) => {
     return (
         <Divider
-            vertical={true} style={{height: "1em", ...style}}/>
+            vertical={true} style={{height: "1em", margin: 0, ...style}}/>
     );
 };
 
