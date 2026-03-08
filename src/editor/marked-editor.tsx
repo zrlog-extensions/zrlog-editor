@@ -4,7 +4,6 @@ import {MarkdownEditorProps} from "./editor.types";
 import {StyledEditor} from "./styles/styled-editor";
 import EditorToolBar from "./editor-tool-bar";
 import useMessage from "antd/es/message/useMessage";
-import {getBorder} from "./editor-helpers";
 import {languages} from "@codemirror/language-data";
 import {markdown} from "@codemirror/lang-markdown";
 
@@ -15,6 +14,7 @@ import {markdownToHtml} from "./utils/marked-utils";
 import SelectionToolbar from "./editor-selection-tool-bar";
 import {copyToClipboard} from "./utils/editor-utils";
 import {getEditorRes, setEditorLang} from "./lang/editor-lang";
+import {Divider} from "antd";
 
 
 type MarkdownEditorState = {
@@ -340,21 +340,25 @@ const MarkedEditor: FunctionComponent<MarkdownEditorProps> = ({
                             overflow: "auto",
                         }}
                     />
-                    <HtmlPreviewPanel
-                        dark={config.dark}
-                        previewRef={previewRef}
-                        style={{
-                            display: state.preview ? "block" : "none",
-                            minWidth: `calc((100% - ${guttersWidth}px) / 2)`,
-                            width: `calc((100% - ${guttersWidth}px) / 2)`,
-                            paddingTop: 4,
-                            paddingBottom: 4,
-                            paddingRight: 2,
-                            paddingLeft: 5,
-                            borderLeft: getBorder(config.dark),
-                        }}
-                        htmlContent={state.content}
-                    />
+                    {state.preview && <>
+                        <Divider vertical={true}
+                                 style={{padding: 0, margin: 0, borderWidth: 1, height: "100%", overflow: "hidden"}}/>
+                        <HtmlPreviewPanel
+                            dark={config.dark}
+                            previewRef={previewRef}
+                            style={{
+                                display: state.preview ? "block" : "none",
+                                minWidth: `calc((100% - ${guttersWidth}px) / 2)`,
+                                width: `calc((100% - ${guttersWidth}px) / 2)`,
+                                paddingTop: 4,
+                                paddingBottom: 4,
+                                paddingRight: 2,
+                                paddingLeft: 5,
+                            }}
+                            htmlContent={state.content}
+                        />
+                    </>}
+
                 </div>
             </div>
             {editorRef.current && previewRef.current && editorRef.current.scrollDOM && (

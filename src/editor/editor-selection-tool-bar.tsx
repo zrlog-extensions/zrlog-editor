@@ -68,7 +68,7 @@ export const SelectionToolbar: React.FC<SelectionToolbarProps> = ({
             <EditorIcon onClick={onItalic}>
                 <Fa7SolidItalic/>
             </EditorIcon>
-            <EditorToolBarDivider dark={dark}/>
+            <EditorToolBarDivider style={{height: "1.5em"}}/>
             {aiConfig && <AIButton
                 drawerWidth={aiConfig.drawerWidth}
                 dark={dark}

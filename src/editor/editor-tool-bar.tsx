@@ -1,8 +1,7 @@
-import {FunctionComponent, useState} from "react";
+import {CSSProperties, FunctionComponent, useState} from "react";
 import {EditorDialogState, UploadConfig} from "./editor.types";
 import EditorDialog from "./dialog/editor-dialog";
 import EditorIcon from "./editor-icon";
-import {getBorder} from "./editor-helpers";
 import Spin from "antd/es/spin";
 import {CloudUploadOutlined} from "@ant-design/icons";
 import {getEditorRes} from "./lang/editor-lang";
@@ -27,6 +26,7 @@ import {Fa7SolidClipboard} from "./icons/Fa7SolidClipboard";
 import {Fa7SolidEyeSlash} from "./icons/Fa7SolidEyeSlash";
 import {Fa7SolidEye} from "./icons/Fa7SolidEye";
 import {Fa7SolidQuestionCircle} from "./icons/Fa7SolidQuestionCircle";
+import {Divider} from "antd";
 
 type EditorToolBarProps = {
     onChange: (val: string, cursorPosition: number) => void;
@@ -40,22 +40,13 @@ type EditorToolBarProps = {
 };
 
 type EditorToolBarDividerProps = {
-    dark: boolean;
+    style?: CSSProperties;
 }
 
-export const EditorToolBarDivider: FunctionComponent<EditorToolBarDividerProps> = ({dark}) => {
+export const EditorToolBarDivider: FunctionComponent<EditorToolBarDividerProps> = ({style}) => {
     return (
-        <span
-            style={{
-                borderRight: getBorder(dark),
-                height: "65%",
-                width: 1,
-                userSelect: "none",
-                display: "inline-block",
-            }}
-        >
-            &nbsp;
-        </span>
+        <Divider
+            vertical={true} style={{height: "1em", ...style}}/>
     );
 };
 
@@ -65,7 +56,6 @@ const EditorToolBar: FunctionComponent<EditorToolBarProps> = ({
                                                                   preview,
                                                                   onEditorModeChange,
                                                                   imageUploading,
-                                                                  dark,
                                                                   uploadConfig
                                                               }) => {
     const [dialogState, setDialogState] = useState<EditorDialogState>({
@@ -107,7 +97,6 @@ const EditorToolBar: FunctionComponent<EditorToolBarProps> = ({
                     alignItems: "center",
                     maxHeight: 79,
                     overflowY: "auto",
-                    borderBottom: getBorder(dark),
                 }}
             >
                 <EditorIcon
@@ -138,7 +127,7 @@ const EditorToolBar: FunctionComponent<EditorToolBarProps> = ({
                 >
                     <Fa7SolidQuoteLeft/>
                 </EditorIcon>
-                <EditorToolBarDivider dark={dark}/>
+                <EditorToolBarDivider/>
                 <EditorIcon
                     onClick={() => {
                         onChange("## ", 3);
@@ -160,7 +149,7 @@ const EditorToolBar: FunctionComponent<EditorToolBarProps> = ({
                 >
                     <Fa7Solid4/>
                 </EditorIcon>
-                <EditorToolBarDivider dark={dark}/>
+                <EditorToolBarDivider/>
                 <EditorIcon
                     onClick={() => {
                         onChange("- ", 2);
@@ -183,7 +172,7 @@ const EditorToolBar: FunctionComponent<EditorToolBarProps> = ({
                 >
                     <Fa7SolidMinus/>
                 </EditorIcon>
-                <EditorToolBarDivider dark={dark}/>
+                <EditorToolBarDivider/>
                 <EditorIcon
                     title={getEditorRes("addLink")}
                     onClick={() => {
@@ -235,7 +224,7 @@ const EditorToolBar: FunctionComponent<EditorToolBarProps> = ({
                 >
                     <Fa7SolidPaperclip/>
                 </EditorIcon>
-                <EditorToolBarDivider dark={dark}/>
+                <EditorToolBarDivider/>
                 <EditorIcon
                     title={getEditorRes("addCode")}
                     onClick={() => {
@@ -284,7 +273,7 @@ const EditorToolBar: FunctionComponent<EditorToolBarProps> = ({
                         <Fa7SolidEye/>
                     </EditorIcon>
                 )}
-                <EditorToolBarDivider dark={dark}/>
+                <EditorToolBarDivider/>
                 <EditorIcon
                     title={getEditorRes("help")}
                     onClick={() => {
@@ -298,6 +287,7 @@ const EditorToolBar: FunctionComponent<EditorToolBarProps> = ({
                     <Fa7SolidQuestionCircle/>
                 </EditorIcon>
             </div>
+            <Divider style={{padding: 0, margin: 0}}/>
         </>
     );
 };
