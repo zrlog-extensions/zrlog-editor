@@ -253,7 +253,7 @@ const MarkedEditor: FunctionComponent<MarkdownEditorProps> = ({
                             };
                         });
                     }}
-                    editorView={editorRef.current.contentDOM as HTMLElement}
+                    pasteView={editorRef.current.contentDOM as HTMLElement}
                 />
             )}
             <div className={config.dark ? "editor-dark" : "editor-light"} style={{overflow: "hidden"}}>

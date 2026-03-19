@@ -7,13 +7,13 @@ type PasteUploadProps = {
     onUploading?: () => void;
     onUploadFailure?: () => void;
     getContainer?: () => HTMLElement;
-    editorView?: HTMLElement;
+    pasteView?: HTMLElement;
     uploadConfig: UploadConfig
 };
 
 const PasteUpload: FunctionComponent<PasteUploadProps> = ({
                                                               onUploadSuccess,
-                                                              editorView,
+                                                              pasteView,
                                                               onUploading,
                                                               onUploadFailure,
                                                               getContainer,
@@ -95,8 +95,8 @@ const PasteUpload: FunctionComponent<PasteUploadProps> = ({
     };
 
     const doHandler = () => {
-        if (editorView) {
-            editorView.addEventListener("paste", doUpload);
+        if (pasteView) {
+            pasteView.addEventListener("paste", doUpload);
         }
     };
 
@@ -104,7 +104,7 @@ const PasteUpload: FunctionComponent<PasteUploadProps> = ({
         doHandler();
 
         return () => {
-            editorView?.removeEventListener("paste", doUpload);
+            pasteView?.removeEventListener("paste", doUpload);
         };
     }, []);
 
