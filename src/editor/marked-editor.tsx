@@ -234,6 +234,7 @@ const MarkedEditor: FunctionComponent<MarkdownEditorProps> = ({
                             };
                         });
                     }}
+                    getContainer={getContainer}
                     onUploadFailure={() => {
                         setState((prevState) => {
                             return {
