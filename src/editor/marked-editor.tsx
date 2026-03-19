@@ -225,7 +225,7 @@ const MarkedEditor: FunctionComponent<MarkdownEditorProps> = ({
                       style={{paddingBottom: config.disableStatistics ? 0 : 30}}>
             {editorRef.current && (
                 <PasteUpload
-                    uploadFormName={config.uploadConfig.formName}
+                    uploadConfig={config.uploadConfig}
                     onUploading={() => {
                         setState((prevState) => {
                             return {

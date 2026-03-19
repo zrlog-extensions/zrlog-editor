@@ -1,5 +1,6 @@
 import {FunctionComponent, useEffect} from "react";
-import {AxiosInstance} from "axios";
+import useMessage from "antd/es/message/useMessage";
+import {UploadConfig} from "./editor.types";
 
 type PasteUploadProps = {
     onUploadSuccess: (imgUrl: string) => void;
@@ -7,9 +8,7 @@ type PasteUploadProps = {
     onUploadFailure?: () => void;
     getContainer?: () => HTMLElement;
     editorView?: HTMLElement;
-    axiosInstance?: AxiosInstance;
-    uploadFormName: string;
-    tryAppendBackendServerUrl?: (string: string) => string;
+    uploadConfig: UploadConfig
 };
 
 const PasteUpload: FunctionComponent<PasteUploadProps> = ({
@@ -17,10 +16,11 @@ const PasteUpload: FunctionComponent<PasteUploadProps> = ({
                                                               editorView,
                                                               onUploading,
                                                               onUploadFailure,
-                                                              axiosInstance,
-                                                              tryAppendBackendServerUrl,
-                                                              uploadFormName
+                                                              getContainer,
+                                                              uploadConfig,
                                                           }) => {
+
+    const [messageApi, contextHolder] = useMessage({maxCount: 3, getContainer: getContainer});
 
     const getFileExt = (filename: string, defaultExt: string) => {
         if (!filename.includes(".")) {
@@ -37,33 +37,35 @@ const PasteUpload: FunctionComponent<PasteUploadProps> = ({
         const index = Math.random().toString(10).substr(2, 5) + "-" + Math.random().toString(36).substr(2);
         const fileName = index + "." + getFileExt(file.name, "jpg");
         const formData = new FormData();
-        formData.append(uploadFormName, file, fileName);
-        if (axiosInstance) {
-            try {
-                const {data} = await axiosInstance.post("/api/admin/upload?dir=image", formData);
-                const url = data.data.url;
-                if (url.startsWith("/") && tryAppendBackendServerUrl) {
-                    return tryAppendBackendServerUrl(data.data.url.substring(1));
-                }
-                return url;
-            } catch (e) {
-                return "";
+        formData.append(uploadConfig.formName ? uploadConfig.formName : "imgFile", file, fileName);
+        try {
+            const {data} = await uploadConfig.axiosInstance.post(uploadConfig.buildUploadUrl("image"), formData);
+            const url = data.data.url;
+            if (url.startsWith("/") && uploadConfig.tryAppendBackendServerUrl) {
+                return uploadConfig.tryAppendBackendServerUrl(data.data.url.substring(1));
             }
+            return url;
+        } catch (e) {
+            //@ts-ignore
+            messageApi.error(e.message);
         }
         return "";
     };
 
     const doUpload = async (e: ClipboardEvent) => {
-        const clipboardData = e.clipboardData;
-        if (clipboardData === null) {
-            return;
-        }
-        const items = clipboardData.items;
+        const items = await window.navigator.clipboard.read();
         const imgFiles: File[] = [];
-        for (let i = 0; i < items.length; i++) {
-            if (items[i].kind === "file" && items[i].type.match(/^image/)) {
-                const file = items[i].getAsFile();
-                if (file) {
+        console.info(items);
+        for (const item of items) {
+            for (const type of item.types) {
+                if (type.startsWith('image/')) {
+                    // getType 返回的是 Blob 对象
+                    const blob = await item.getType(type);
+                    // 将 Blob 转换为 File 对象（如果你的后端或逻辑需要 File）
+                    const file = new File([blob], `clipboard-image.${type.split('/')[1]}`, {
+                        type: type
+                    });
+
                     imgFiles.push(file);
                 }
             }
@@ -106,7 +108,9 @@ const PasteUpload: FunctionComponent<PasteUploadProps> = ({
         };
     }, []);
 
-    return <></>;
+    return <>
+        {contextHolder}
+    </>;
 };
 
 export default PasteUpload;
