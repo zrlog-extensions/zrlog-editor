@@ -3,22 +3,22 @@ import {AIContent} from "../ai/AIContentItem";
 import {Locale} from "./lang/editor-lang";
 import {AxiosInstance} from "axios";
 
-export type MarkdownEditorProps = {
+export type ZrLogEditorProps = {
     height: any;
     onChange: (content: ChangedContent) => void;
     value?: string;
     loadSuccess?: (editor: any) => void;
     getContainer?: () => HTMLElement;
     fullscreen: boolean;
-    content: string;
+    previewContent: string;
     placeholder?: string;
     config: EditorConfig;
     axiosInstance?: AxiosInstance;
 };
 
 export type ChangedContent = {
-    content: string;
-    markdown: string;
+    previewContent: string;
+    value: string;
 }
 
 export type AIConfig = {

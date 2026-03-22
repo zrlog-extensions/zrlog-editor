@@ -1,5 +1,5 @@
 import {AIProviderType} from "../type";
-import MarkedEditor from "../editor/marked-editor";
+import Editor from "../editor";
 import {lang} from "./ConfigProviderApp";
 import {Card, Layout} from "antd";
 import {marked} from "marked";
@@ -78,12 +78,12 @@ const HomePage: FunctionComponent<TestMarkdownEditorProps> = ({dark}) => {
                 padding: 0
             }
         }}>
-            <MarkedEditor height={518} onChange={(e) => {
-                setValue(e.markdown)
+            <Editor height={518} onChange={(e) => {
+                setValue(e.value)
             }} fullscreen={false} value={markdown}
-                          axiosInstance={axios.create()}
-                          content={marked(markdown) as string}
-                          config={editorConfig}
+                   axiosInstance={axios.create()}
+                   previewContent={marked(markdown) as string}
+                   config={editorConfig}
 
             />
 

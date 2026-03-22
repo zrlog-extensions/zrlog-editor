@@ -1,6 +1,6 @@
 import CodeMirror, {EditorSelection, EditorState, EditorView, ViewUpdate} from "@uiw/react-codemirror";
 import {FunctionComponent, useCallback, useEffect, useMemo, useRef, useState} from "react";
-import {MarkdownEditorProps} from "./editor.types";
+import {ZrLogEditorProps} from "./editor.types";
 import {StyledEditor} from "./styles/styled-editor";
 import EditorToolBar from "./editor-tool-bar";
 import useMessage from "antd/es/message/useMessage";
@@ -32,11 +32,11 @@ type SelectionToolbarState = {
     text: string;
 };
 
-const MarkedEditor: FunctionComponent<MarkdownEditorProps> = ({
+const Editor: FunctionComponent<ZrLogEditorProps> = ({
                                                                   height,
                                                                   value,
                                                                   onChange,
-                                                                  content,
+                                                                  previewContent,
                                                                   loadSuccess,
                                                                   getContainer,
                                                                   placeholder,
@@ -48,7 +48,7 @@ const MarkedEditor: FunctionComponent<MarkdownEditorProps> = ({
         initValue: value ? value : "",
         //默认开启
         preview: config.preview,
-        content: content,
+        content: previewContent,
         imageUploading: false,
     });
 
@@ -324,13 +324,13 @@ const MarkedEditor: FunctionComponent<MarkdownEditorProps> = ({
                             editorRef.current = view;
                             onViewChange();
                         }}
-                        onChange={async (md) => {
-                            const html = await markdownToHtml(md);
+                        onChange={async (value) => {
+                            const html = await markdownToHtml(value);
                             //console.info(html + "=..");
 
                             const changeValues = {
-                                content: html,
-                                markdown: md,
+                                previewContent: html,
+                                value: value,
                             };
                             setState((prevState) => {
                                 return {
@@ -374,4 +374,4 @@ const MarkedEditor: FunctionComponent<MarkdownEditorProps> = ({
     );
 };
 
-export default MarkedEditor;
+export default Editor;
