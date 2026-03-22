@@ -1450,7 +1450,7 @@
     "@lezer/common" "^1.0.0"
     "@lezer/xml" "^1.0.0"
 
-"@codemirror/lang-yaml@^6.0.0":
+"@codemirror/lang-yaml@6.1.2", "@codemirror/lang-yaml@^6.0.0":
   version "6.1.2"
   resolved "https://registry.npmmirror.com/@codemirror/lang-yaml/-/lang-yaml-6.1.2.tgz#c84280c68fa7af456a355d91183b5e537e9b7038"
   integrity sha512-dxrfG8w5Ce/QbT7YID7mWZFKhdhsaTNOYjOkSIMt1qmC4VQnXSDSYVHHHn8k6kJUfIhtLo8t1JJgltlxWdsITw==

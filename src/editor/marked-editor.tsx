@@ -15,6 +15,7 @@ import SelectionToolbar from "./editor-selection-tool-bar";
 import {copyToClipboard} from "./utils/editor-utils";
 import {getEditorRes, setEditorLang} from "./lang/editor-lang";
 import {Divider} from "antd";
+import {yaml} from "@codemirror/lang-yaml";
 
 
 type MarkdownEditorState = {
@@ -197,7 +198,11 @@ const MarkedEditor: FunctionComponent<MarkdownEditorProps> = ({
         if (config.lang) {
             setEditorLang(config.lang);
         }
-        extArr.push(markdown({codeLanguages: languages}) as never);
+        if (config.mode === "YML") {
+            extArr.push(yaml() as never);
+        } else {
+            extArr.push(markdown({codeLanguages: languages}) as never);
+        }
         extArr.push(EditorView.lineWrapping as never);
         // 中文翻译对象
         extArr.push(EditorState.phrases.of(getEditorRes("findDialog")) as never);

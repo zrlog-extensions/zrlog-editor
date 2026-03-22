@@ -4,6 +4,7 @@ import en_US from "antd/es/locale/en_US";
 import {legacyLogicalPropertiesTransformer, StyleProvider} from "@ant-design/cssinjs";
 import {BrowserRouter, Route, Routes} from "react-router-dom";
 import HomePage from "./HomePage";
+import YmlEditor from "./YmlEditor";
 
 const {darkAlgorithm, defaultAlgorithm} = theme;
 
@@ -49,6 +50,10 @@ const ConfigProviderApp = () => {
                         }}
                     >
                         <Routes>
+                            <Route
+                                path={"/yml"}
+                                element={<YmlEditor dark={getPreferredColorScheme() === "dark"}/>}
+                            />
                             <Route
                                 path={"/*"}
                                 element={<HomePage dark={getPreferredColorScheme() === "dark"}/>}

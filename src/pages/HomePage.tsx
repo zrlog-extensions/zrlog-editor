@@ -8,8 +8,8 @@ import {toStatisticsByMarkdown} from "../editor/utils/editor-utils";
 import {FunctionComponent, useState} from "react";
 import axios from "axios";
 import Title from "antd/es/typography/Title";
-import HtmlPreviewPanel from "../editor/html-preview-panel";
 import {EditorConfig} from "../editor/editor.types";
+import Footer from "./Footer";
 
 type TestMarkdownEditorProps = {
     dark: boolean
@@ -93,12 +93,7 @@ const HomePage: FunctionComponent<TestMarkdownEditorProps> = ({dark}) => {
                                                                   dark={dark}/>
             }
         </Card>
-        <div style={{textAlign: "center", paddingTop: 24}}>
-            Made with ❤️ by ZrLog Team
-            <HtmlPreviewPanel dark={dark}
-                              style={{paddingTop: 12}}
-                              htmlContent={marked(`[官网](https://www.zrlog.com) · [文档](https://www.zrlog.com/doc) · [演示](https://editor.zrlog.com)`) as string}/>
-        </div>
+        <Footer dark={dark}/>
     </Layout>
 }
 export default HomePage;

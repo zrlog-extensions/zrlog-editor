@@ -8,49 +8,29 @@ import {toStatisticsByMarkdown} from "../editor/utils/editor-utils";
 import {FunctionComponent, useState} from "react";
 import axios from "axios";
 import Title from "antd/es/typography/Title";
-import HtmlPreviewPanel from "../editor/html-preview-panel";
-import {EditorConfig} from "../editor/editor.types";
+import {EditorConfig, EditorMode} from "../editor/editor.types";
+import Footer from "./Footer";
 
 type TestMarkdownEditorProps = {
     dark: boolean
 }
 
-const markdown = "### Editor\n" +
-    "\n" +
-    "<div align=\"center\">\n" +
-    "\n" +
-    "一个功能强大、现代化的 Markdown 编辑器，基于 React + CodeMirror + Marked 构建。\n" +
-    "\n" +
-    "[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)\n" +
-    "[![Node Version](https://img.shields.io/badge/node-%3E%3D18.9.0-brightgreen)](https://nodejs.org/)\n" +
-    "[![React](https://img.shields.io/badge/react-18.3.1-61dafb)](https://reactjs.org/)\n" +
-    "[![TypeScript](https://img.shields.io/badge/typescript-5.8.3-blue)](https://www.typescriptlang.org/)\n" +
-    "\n" +
-    "</div>\n" +
-    "\n" +
-    "## ✨ 特性\n" +
-    "\n" +
-    "- 📝 **实时预览** - 即时 Markdown 渲染，所见即所得\n" +
-    "- 🎨 **语法高亮** - 支持多种编程语言的代码高亮显示\n" +
-    "- 🤖 **AI 辅助写作** - 内置 AI 写作助手，提升创作效率\n" +
-    "- 📊 **数学公式** - 支持 KaTeX 数学公式渲染\n" +
-    "- 🔄 **滚动同步** - 编辑器与预览面板智能同步滚动\n" +
-    "- 📷 **图片上传** - 支持粘贴和拖拽上传图片及视频\n" +
-    "- 🎯 **流程图支持** - 支持 flowchart.js 流程图和时序图\n" +
-    "- 📱 **响应式设计** - 完美适配桌面和移动设备\n" +
-    "- 🌐 **国际化** - 支持多语言界面\n" +
-    "- ⚡ **高性能** - 基于现代前端技术栈，运行流畅\n"
+const markdown = "- just: write some\n" +
+    "- yaml: \n" +
+    "  - [here, and]\n" +
+    "  - {it: updates, in: real-time}\n"
 
-const HomePage: FunctionComponent<TestMarkdownEditorProps> = ({dark}) => {
+const YmlEditor: FunctionComponent<TestMarkdownEditorProps> = ({dark}) => {
 
     const [value, setValue] = useState<string>(markdown);
 
     const editorConfig = {
-        disableToolbar: false,
+        disableToolbar: true,
         disableStatistics: false,
         dark: dark,
-        preview: true,
+        preview: false,
         lang: lang,
+        mode: EditorMode.YML,
         aiConfig: {
             drawerWidth: 1024,
             aiProvider: AIProviderType.DEEP_SEEK,
@@ -75,7 +55,8 @@ const HomePage: FunctionComponent<TestMarkdownEditorProps> = ({dark}) => {
         <Title level={2} style={{textAlign: "center", paddingBottom: 32}}>Markdown Editor</Title>
         <Card title={""} styles={{
             body: {
-                padding: 0
+                padding: 0,
+                overflow: "hidden"
             }
         }}>
             <MarkedEditor height={518} onChange={(e) => {
@@ -93,12 +74,7 @@ const HomePage: FunctionComponent<TestMarkdownEditorProps> = ({dark}) => {
                                                                   dark={dark}/>
             }
         </Card>
-        <div style={{textAlign: "center", paddingTop: 24}}>
-            Made with ❤️ by ZrLog Team
-            <HtmlPreviewPanel dark={dark}
-                              style={{paddingTop: 12}}
-                              htmlContent={marked(`[官网](https://www.zrlog.com) · [文档](https://www.zrlog.com/doc) · [演示](https://editor.zrlog.com)`) as string}/>
-        </div>
+        <Footer dark={dark}/>
     </Layout>
 }
-export default HomePage;
+export default YmlEditor;

@@ -47,6 +47,11 @@ export type UploadConfig = {
     tryAppendBackendServerUrl?: (string: string) => string;
 }
 
+export enum EditorMode  {
+    MARKDOWN = "MARKDOWN",
+    YML = "YML",
+}
+
 export type EditorConfig = {
     aiConfig?: AIConfig;
     colorPrimary?: string;
@@ -55,6 +60,7 @@ export type EditorConfig = {
     disableToolbar?: boolean;
     disableStatistics?: boolean;
     preview: boolean;
+    mode?: EditorMode;
     onPreviewChange?: (preview: boolean) => void;
     uploadConfig: UploadConfig;
     axiosInstance?: AxiosInstance;
