@@ -20,7 +20,7 @@ import {yaml} from "@codemirror/lang-yaml";
 
 type MarkdownEditorState = {
     initValue: string;
-    content: string;
+    previewContent: string;
     preview: boolean;
     imageUploading: boolean;
 };
@@ -48,7 +48,7 @@ const Editor: FunctionComponent<ZrLogEditorProps> = ({
         initValue: value ? value : "",
         //默认开启
         preview: config.preview,
-        content: previewContent,
+        previewContent: previewContent,
         imageUploading: false,
     });
 
@@ -115,7 +115,7 @@ const Editor: FunctionComponent<ZrLogEditorProps> = ({
     };
 
     const doCopy = async () => {
-        copyToClipboard('<div class="markdown-body" style="padding:0">' + state.content + "</div>");
+        copyToClipboard('<div class="markdown-body" style="padding:0">' + state.previewContent + "</div>");
         messageApi.info(getEditorRes("copPreviewHtmlToClipboardSuccess"));
     };
 
@@ -361,14 +361,14 @@ const Editor: FunctionComponent<ZrLogEditorProps> = ({
                                 paddingRight: 2,
                                 paddingLeft: 5,
                             }}
-                            htmlContent={state.content}
+                            htmlContent={state.previewContent}
                         />
                     </>}
 
                 </div>
             </div>
             {editorRef.current && previewRef.current && editorRef.current.scrollDOM && (
-                <ScrollSync mdKey={state.content} editorRef={editorRef} previewRef={previewRef}/>
+                <ScrollSync mdKey={state.previewContent} editorRef={editorRef} previewRef={previewRef}/>
             )}
         </StyledEditor>
     );
