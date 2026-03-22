@@ -26,7 +26,7 @@ const YmlEditor: FunctionComponent<TestMarkdownEditorProps> = ({dark}) => {
 
     const editorConfig = {
         disableToolbar: true,
-        disableStatistics: false,
+        disableStatistics: true,
         dark: dark,
         preview: false,
         lang: lang,
@@ -36,7 +36,7 @@ const YmlEditor: FunctionComponent<TestMarkdownEditorProps> = ({dark}) => {
             aiProvider: AIProviderType.DEEP_SEEK,
             sessionId: 0,
             aiApiUri: "/api/ai",
-            subject: "Markdown Editor",
+            subject: "Yml Editor",
             user: {
                 avatarUrl: "https://www.zrlog.com/favicon.svg",
                 nickname: "test"
@@ -52,7 +52,7 @@ const YmlEditor: FunctionComponent<TestMarkdownEditorProps> = ({dark}) => {
     } as EditorConfig
 
     return <Layout style={{height: "100vh", padding: 16}}>
-        <Title level={2} style={{textAlign: "center", paddingBottom: 32}}>Markdown Editor</Title>
+        <Title level={2} style={{textAlign: "center", paddingBottom: 32}}>Yml Editor</Title>
         <Card title={""} styles={{
             body: {
                 padding: 0,
