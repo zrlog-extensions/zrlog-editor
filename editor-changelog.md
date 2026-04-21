@@ -33,8 +33,12 @@
 
 - fix mobile click error
 
-### 2.x
+### 2.0
 
 > remove editormd
 
 - base `antd ui` + `codemirror` + `marked`
+
+### 2.1
+
+- ai editor add stream rsponse
