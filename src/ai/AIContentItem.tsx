@@ -93,18 +93,14 @@ const AIContentItem = forwardRef<HTMLDivElement, AIContentItemProps>(
         }
 
         const getAIReplyContent = () => {
-            if (content.thinking || content.content.length === 0) {
-                return (
-                    <>
-                        <span style={{paddingRight: 8}}>{getEditorRes("ai").thinking}</span>
-                        <LoadingOutlined/>
-                    </>
-                );
-            }
             return (
                 <>
-                    <HtmlPreviewPanel dark={dark} htmlContent={html} style={{maxWidth: "90%"}}/>
-                    <Paragraph copyable={{text: content.content}} style={{paddingTop: 8}}/>
+                    {content.content.length === 0 ?
+                        <span style={{paddingRight: 8}}>{getEditorRes("ai").thinking}</span> : <>
+                            <HtmlPreviewPanel dark={dark} htmlContent={html} style={{maxWidth: "90%"}}/>
+                            <Paragraph copyable={{text: content.content}} style={{paddingTop: 8}}/>
+                        </>}
+                    {content.thinking && <LoadingOutlined/>}
                 </>
             );
         };
@@ -112,7 +108,7 @@ const AIContentItem = forwardRef<HTMLDivElement, AIContentItemProps>(
         return (
             <div style={{...style}} ref={ref}>
                 <div style={{paddingBottom: 12}}>
-                    <Avatar icon={<AIIcon name={aiProvider}/>}/>
+                    <Avatar icon={<AIIcon name={aiProvider}/>} style={{height: 34, width: 34}}/>
                     <span style={{paddingLeft: 8}}>{getEditorRes("ai").ai}</span>
                 </div>
                 {getAIReplyContent()}

@@ -15,7 +15,7 @@ const AIChatContentPanel: FunctionComponent<AIChatContentPanelProps> = ({content
     const scrollToItem = (id: string) => {
         const el = itemRefs.current[id];
         if (el) {
-            el.scrollIntoView({behavior: "smooth", block: "start"});
+            el.scrollIntoView({behavior: "smooth", block: "end"});
         }
     };
 
@@ -26,12 +26,9 @@ const AIChatContentPanel: FunctionComponent<AIChatContentPanelProps> = ({content
     return (
         <div
             style={{
-                paddingRight: 16,
-                paddingLeft: 16,
-                paddingTop: 12,
                 maxHeight: "calc(100vh - 168px)",
                 maxWidth: 768,
-                width: "100%",
+                width: "100%"
             }}
         >
             {contents.map((e, idx) => {

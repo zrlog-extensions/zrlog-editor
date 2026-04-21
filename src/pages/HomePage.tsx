@@ -41,6 +41,8 @@ const markdown = "### Editor\n" +
     "- 🌐 **国际化** - 支持多语言界面\n" +
     "- ⚡ **高性能** - 基于现代前端技术栈，运行流畅\n"
 
+axios.defaults.headers.common['X-ZrLog-Admin-Token'] = "1#674369433734556B326D49546450445376507351714C376D364E33644B383366392B72737333705A3041777065506254615875454362574C614E354754465834754E59347167565230363371726337324E6434597465526A786D534C4570555A41585A513067504475436E4C432B314E74595954327138354B3775613761476A4C7449714F585957492B57567A61756269514C5075513D3D";
+
 const HomePage: FunctionComponent<TestMarkdownEditorProps> = ({dark}) => {
 
     const [value, setValue] = useState<string>(markdown);
@@ -53,15 +55,18 @@ const HomePage: FunctionComponent<TestMarkdownEditorProps> = ({dark}) => {
         lang: lang,
         aiConfig: {
             drawerWidth: 1024,
-            aiProvider: AIProviderType.DEEP_SEEK,
+            aiProvider: AIProviderType.GOOGLE_GEMINI,
             sessionId: 0,
-            aiApiUri: "/api/ai",
+            aiApiUri: "http://localhost:17080/sub/api/admin/article/ai",
             subject: "Markdown Editor",
             user: {
                 avatarUrl: "https://www.zrlog.com/favicon.svg",
                 nickname: "test"
             }
         },
+        axiosInstance: axios.create({
+            withCredentials: true
+        }),
         uploadConfig: {
             buildUploadUrl: (type) => {
                 return `/api/${type}`;
@@ -81,9 +86,9 @@ const HomePage: FunctionComponent<TestMarkdownEditorProps> = ({dark}) => {
             <Editor height={518} onChange={(e) => {
                 setValue(e.value)
             }} fullscreen={false} value={markdown}
-                   axiosInstance={axios.create()}
-                   previewContent={marked(markdown) as string}
-                   config={editorConfig}
+                    axiosInstance={axios.create()}
+                    previewContent={marked(markdown) as string}
+                    config={editorConfig}
 
             />
 

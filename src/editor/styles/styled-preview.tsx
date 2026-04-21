@@ -270,6 +270,27 @@ const lightCss = `
     .markdown-body .katex-display {
         display: inline-block;
     }
+
+    .code-block-wrapper {
+        position: relative;
+    }
+
+    .code-block-wrapper .copy-button {
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        opacity: 0;
+        transition: opacity 0.2s;
+        z-index: 10;
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 4px;
+        padding: 2px;
+        line-height: 0;
+    }
+
+    .code-block-wrapper:hover .copy-button {
+        opacity: 1;
+    }
 `;
 
 const DarkStylePreview = styled(`div`)`
@@ -289,6 +310,10 @@ const DarkStylePreview = styled(`div`)`
 
     .markdown-body table tr:nth-child(2n) {
         background-color: #212529 !important;
+    }
+
+    .code-block-wrapper .copy-button {
+        background: rgba(0, 0, 0, 0.5);
     }
 `;
 

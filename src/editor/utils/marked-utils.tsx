@@ -7,8 +7,9 @@ import flowchart from "flowchart.js";
 import SequenceDiagram from "react-sequence-diagram";
 import { createRoot, Root } from "react-dom/client";
 import katex from "katex";
+import { Typography } from "antd";
 
-const renderMap = new Map<Element, Root>();
+const renderMap = new WeakMap<Element, Root>();
 
 function renderDiagramReact(el: Element, content: JSX.Element) {
     let root = renderMap.get(el);
@@ -56,7 +57,20 @@ const getCodeAndCleanUp = (div: Element) => {
     return code;
 };
 
+export function hydrateReactComponents(virtualElement: HTMLElement) {
+    virtualElement.querySelectorAll(".code-block-wrapper").forEach((div) => {
+        const code = getCodeAndCleanUp(div);
+        if (code) {
+            const copyBtn = document.createElement("div");
+            copyBtn.className = "copy-button";
+            div.appendChild(copyBtn);
+            renderDiagramReact(copyBtn, <Typography.Paragraph copyable={{ text: code }} style={{ margin: 0 }} />);
+        }
+    });
+}
+
 async function hydrateCodeBlocks(virtualElement: HTMLElement) {
+
     virtualElement.querySelectorAll(".flow").forEach((div) => {
         const code = getCodeAndCleanUp(div);
         try {

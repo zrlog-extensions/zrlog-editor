@@ -26,7 +26,7 @@ renderer.code = function ({text, lang}) {
     const validLang = lang && hljs.getLanguage(lang) ? lang : "";
     if (validLang) {
         const highlighted = hljs.highlight(text, {language: validLang}).value;
-        return `<pre><code class="hljs language-${validLang}">${highlighted}</code></pre>`;
+        return `<div class="code-block-wrapper" data-code="${encodeURIComponent(text)}"><pre><code class="hljs language-${validLang}">${highlighted}</code></pre></div>`;
     } else if (lang === "flow") {
         const id = "flow_" + md5(text);
         // 返回占位 div
@@ -49,7 +49,7 @@ renderer.code = function ({text, lang}) {
         return `<div id="${id}" data-code="${encodeURIComponent(text)}" class="katex"></div>`;
     }
     const highlighted = hljs.highlightAuto(text).value;
-    return `<pre><code class="hljs">${highlighted}</code></pre>`;
+    return `<div class="code-block-wrapper" data-code="${encodeURIComponent(text)}"><pre><code class="hljs">${highlighted}</code></pre></div>`;
 };
 
 marked.setOptions({

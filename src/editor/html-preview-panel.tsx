@@ -3,6 +3,7 @@ import {StyledHighlightDefault} from "./highlight/styled-highlight-default";
 import {CSSProperties, FunctionComponent, MutableRefObject, useEffect, useRef} from "react";
 import "katex/dist/katex.min.css";
 import StyledPreview from "./styles/styled-preview";
+import { hydrateReactComponents } from "./utils/marked-utils";
 
 export type EditorPreviewProps = {
     htmlContent: string;
@@ -26,6 +27,7 @@ const HtmlPreviewPanel: FunctionComponent<EditorPreviewProps> = ({
     useEffect(() => {
         if (ref.current && ref.current.innerHTML !== htmlContent) {
             ref.current.innerHTML = htmlContent;
+            hydrateReactComponents(ref.current);
         }
     }, [htmlContent]);
 

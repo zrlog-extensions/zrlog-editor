@@ -1,6 +1,6 @@
 {
   "name": "editor",
-  "version": "2.0.77-SNAPSHOT",
+  "version": "2.0.103-SNAPSHOT",
   "homepage": "./",
   "license": "MIT",
   "dependencies": {
@@ -27,7 +27,7 @@
   },
   "scripts": {
     "lint": "yarn type-check",
-    "start": "craco start",
+    "start": "export PORT=3030 && craco start",
     "type-check": "tsc --project tsconfig.json --pretty --noEmit",
     "build": "tsc",
     "pages": "craco build",
