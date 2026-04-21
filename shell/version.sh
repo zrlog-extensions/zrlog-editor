@@ -4,7 +4,7 @@ rm -rf temp
 rm -rf artifacts
 mkdir -p artifacts
 yarn lint
-baseVersion=2.0
+baseVersion=2.1
 releaseVersion=${baseVersion}.${1}
 nextVersion=${baseVersion}.$((${1}+1))-SNAPSHOT
 yarn version --new-version=${releaseVersion}
