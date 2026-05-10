@@ -8,6 +8,7 @@ import SequenceDiagram from "react-sequence-diagram";
 import { createRoot, Root } from "react-dom/client";
 import katex from "katex";
 import { Typography } from "antd";
+import { getEditorRes } from "../lang/editor-lang";
 
 const renderMap = new WeakMap<Element, Root>();
 
@@ -64,7 +65,13 @@ export function hydrateReactComponents(virtualElement: HTMLElement) {
             const copyBtn = document.createElement("div");
             copyBtn.className = "copy-button";
             div.appendChild(copyBtn);
-            renderDiagramReact(copyBtn, <Typography.Paragraph copyable={{ text: code }} style={{ margin: 0 }} />);
+            renderDiagramReact(
+                copyBtn,
+                <Typography.Paragraph
+                    copyable={{ text: code, tooltips: [getEditorRes("copy"), getEditorRes("copied")] }}
+                    style={{ margin: 0 }}
+                />,
+            );
         }
     });
 }
