@@ -32,17 +32,30 @@ type SelectionToolbarState = {
     text: string;
 };
 
+export const insertTextAtCursor = (text: string, cursorPosition: number, view?: EditorView | null) => {
+    if (!view) return;
+
+    const pos = view.state.selection.main.head; // 当前光标位置
+
+    view.dispatch({
+        changes: {from: pos, insert: text},
+        selection: EditorSelection.cursor(pos + cursorPosition),
+        scrollIntoView: true,
+    });
+    view.focus(); // 确保光标可见
+};
+
 const Editor: FunctionComponent<ZrLogEditorProps> = ({
-                                                                  height,
-                                                                  value,
-                                                                  onChange,
-                                                                  previewContent,
-                                                                  loadSuccess,
-                                                                  getContainer,
-                                                                  placeholder,
-                                                                  config,
-                                                                  axiosInstance,
-                                                              }) => {
+                                                         height,
+                                                         value,
+                                                         onChange,
+                                                         previewContent,
+                                                         loadSuccess,
+                                                         getContainer,
+                                                         placeholder,
+                                                         config,
+                                                         axiosInstance,
+                                                     }) => {
 
     const [state, setState] = useState<MarkdownEditorState>({
         initValue: value ? value : "",
@@ -100,19 +113,6 @@ const Editor: FunctionComponent<ZrLogEditorProps> = ({
 
     const [messageApi, contextHolder] = useMessage({maxCount: 3, getContainer: getContainer});
 
-    const insertTextAtCursor = (text: string, cursorPosition: number) => {
-        const view = editorRef.current;
-        if (!view) return;
-
-        const pos = view.state.selection.main.head; // 当前光标位置
-
-        view.dispatch({
-            changes: {from: pos, insert: text},
-            selection: EditorSelection.cursor(pos + cursorPosition),
-            scrollIntoView: true,
-        });
-        view.focus(); // 确保光标可见
-    };
 
     const doCopy = async () => {
         copyToClipboard('<div class="markdown-body" style="padding:0">' + state.previewContent + "</div>");
@@ -120,8 +120,8 @@ const Editor: FunctionComponent<ZrLogEditorProps> = ({
     };
 
     useEffect(() => {
-        if (loadSuccess) {
-            loadSuccess(null);
+        if (loadSuccess && editorRef.current) {
+            loadSuccess(editorRef.current);
         }
     }, []);
 
@@ -250,7 +250,7 @@ const Editor: FunctionComponent<ZrLogEditorProps> = ({
                     }}
                     onUploadSuccess={(imgUrl) => {
                         const content = "![](" + imgUrl + ")\n";
-                        insertTextAtCursor(content, content.length);
+                        insertTextAtCursor(content, content.length, editorRef.current);
                         setState((prevState) => {
                             return {
                                 ...prevState,
@@ -269,7 +269,7 @@ const Editor: FunctionComponent<ZrLogEditorProps> = ({
                     dark={config.dark}
                     imageUploading={state.imageUploading}
                     onChange={(mdStr, cursorPosition) => {
-                        insertTextAtCursor(mdStr, cursorPosition);
+                        insertTextAtCursor(mdStr, cursorPosition, editorRef.current);
                     }}
                     onCopy={async () => {
                         await doCopy();
