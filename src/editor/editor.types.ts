@@ -2,12 +2,13 @@ import {AIProviderType, EditorUser} from "../type";
 import {AIContent} from "../ai/AIContentItem";
 import {Locale} from "./lang/editor-lang";
 import {AxiosInstance} from "axios";
+import {EditorView} from "@uiw/react-codemirror";
 
 export type ZrLogEditorProps = {
     height: any;
     onChange: (content: ChangedContent) => void;
     value?: string;
-    loadSuccess?: (editor: any) => void;
+    loadSuccess?: (editor: EditorView) => void;
     getContainer?: () => HTMLElement;
     fullscreen: boolean;
     previewContent: string;
@@ -47,7 +48,7 @@ export type UploadConfig = {
     tryAppendBackendServerUrl?: (string: string) => string;
 }
 
-export enum EditorMode  {
+export enum EditorMode {
     MARKDOWN = "MARKDOWN",
     YML = "YML",
 }

@@ -1,5 +1,5 @@
 import CodeMirror, {EditorSelection, EditorState, EditorView, ViewUpdate} from "@uiw/react-codemirror";
-import {FunctionComponent, useCallback, useEffect, useMemo, useRef, useState} from "react";
+import {FunctionComponent, useCallback, useMemo, useRef, useState} from "react";
 import {ZrLogEditorProps} from "./editor.types";
 import {StyledEditor} from "./styles/styled-editor";
 import EditorToolBar from "./editor-tool-bar";
@@ -118,12 +118,6 @@ const Editor: FunctionComponent<ZrLogEditorProps> = ({
         copyToClipboard('<div class="markdown-body" style="padding:0">' + state.previewContent + "</div>");
         messageApi.info(getEditorRes("copPreviewHtmlToClipboardSuccess"));
     };
-
-    useEffect(() => {
-        if (loadSuccess && editorRef.current) {
-            loadSuccess(editorRef.current);
-        }
-    }, []);
 
     const onViewChange = () => {
         if (editorRef.current && editorRef.current.dom) {
@@ -322,6 +316,9 @@ const Editor: FunctionComponent<ZrLogEditorProps> = ({
                         extensions={extensions}
                         onCreateEditor={(view) => {
                             editorRef.current = view;
+                            if (loadSuccess) {
+                                loadSuccess(view);
+                            }
                             onViewChange();
                         }}
                         onChange={async (value) => {
