@@ -322,7 +322,7 @@ const Editor: FunctionComponent<ZrLogEditorProps> = ({
                             onViewChange();
                         }}
                         onChange={async (value) => {
-                            const html = await markdownToHtml(value);
+                            const html = await markdownToHtml(value, {linkPreview: config.linkPreview, axiosInstance});
                             //console.info(html + "=..");
 
                             const changeValues = {

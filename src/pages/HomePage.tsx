@@ -41,7 +41,7 @@ const markdown = "### Editor\n" +
     "- 🌐 **国际化** - 支持多语言界面\n" +
     "- ⚡ **高性能** - 基于现代前端技术栈，运行流畅\n"
 
-axios.defaults.headers.common['X-ZrLog-Admin-Token'] = "1#674369433734556B326D49546450445376507351714C376D364E33644B383366392B72737333705A3041777065506254615875454362574C614E354754465834754E59347167565230363371726337324E6434597465526A786D534C4570555A41585A513067504475436E4C432B314E74595954327138354B3775613761476A4C7449714F585957492B57567A61756269514C5075513D3D";
+axios.defaults.headers.common['X-ZrLog-Admin-Token'] = "1#674369433734556B326D495464504453765073517143476F326C725656304C6D4C3348384871567A4238514C7341512F38757679705143786A646A65364B7867544C546B676C414A38584857414C71573951796B59317738684C7043434C547635484D34596F38726C336D6452586C335549533333496E6D584B64795249504F792F35552F445837783443547133387764314D5056773D3D";
 
 const HomePage: FunctionComponent<TestMarkdownEditorProps> = ({dark}) => {
 
@@ -67,6 +67,10 @@ const HomePage: FunctionComponent<TestMarkdownEditorProps> = ({dark}) => {
         axiosInstance: axios.create({
             withCredentials: true
         }),
+        linkPreview: {
+            apiUrl: "http://localhost:17080/sub/api/admin/link-preview",
+            enabled: true,
+        },
         uploadConfig: {
             buildUploadUrl: (type) => {
                 return `/api/${type}`;

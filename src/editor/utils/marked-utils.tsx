@@ -9,8 +9,17 @@ import { createRoot, Root } from "react-dom/client";
 import katex from "katex";
 import { Typography } from "antd";
 import { getEditorRes } from "../lang/editor-lang";
+import {LinkPreviewConfig, LinkPreviewData} from "../editor.types";
+import {AxiosInstance} from "axios";
 
 const renderMap = new WeakMap<Element, Root>();
+const standaloneUrlPattern = /^https?:\/\/[^\s<>"']+$/i;
+const linkPreviewCache = new Map<string, Promise<LinkPreviewData | null | undefined>>();
+
+export type MarkdownRenderOptions = {
+    linkPreview?: boolean | LinkPreviewConfig;
+    axiosInstance?: AxiosInstance;
+}
 
 function renderDiagramReact(el: Element, content: JSX.Element) {
     let root = renderMap.get(el);
@@ -121,16 +130,120 @@ const markdownRenderToDiv = (markdownValue: string) => {
     return container;
 };
 
-export const markdownToHtml = async (markdownValue: string) => {
-    const container = markdownRenderToDiv(markdownValue);
+const isLinkPreviewEnabled = (linkPreview?: boolean | LinkPreviewConfig) => {
+    if (linkPreview === undefined) {
+        return false;
+    }
+    if (typeof linkPreview === "boolean") {
+        return linkPreview;
+    }
+    return linkPreview.enabled !== false;
+};
+
+const getLinkPreviewApiUrl = (linkPreview?: boolean | LinkPreviewConfig) => {
+    if (!linkPreview || typeof linkPreview === "boolean") {
+        return "";
+    }
+    return linkPreview.apiUrl || "";
+};
+
+const escapeHtml = (value?: string) => {
+    return (value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+};
+
+const escapeAttr = escapeHtml;
+
+const linkPreviewCardHtml = (preview: LinkPreviewData) => {
+    const url = escapeAttr(preview.url);
+    const title = escapeHtml(preview.title || preview.url);
+    const description = escapeHtml(preview.description);
+    const image = escapeAttr(preview.image);
+    const meta = escapeHtml([preview.siteName, preview.domain].filter(Boolean).join(" · "));
+    const imageHtml = image
+        ? `<img src="${image}" alt="${title}" style="width:116px;min-height:96px;object-fit:cover;flex:0 0 116px;border:0" />`
+        : "";
+    const metaHtml = meta
+        ? `<span style="color:inherit;opacity:.72;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${meta}</span>`
+        : "";
+    const descriptionHtml = description
+        ? `<span style="color:inherit;opacity:.72;font-size:13px;line-height:1.45;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${description}</span>`
+        : "";
+    return `<div class="zrlog-link-preview-card" data-zrlog-link-preview-url="${url}" style="margin:0 0 1rem"><a href="${url}" target="_blank" rel="noreferrer" style="display:flex;gap:12px;color:inherit;text-decoration:none;border:1px solid rgba(127,127,127,.35);border-radius:10px;overflow:hidden">${imageHtml}<span style="min-width:0;padding:${image ? "12px 12px 12px 0" : "12px"};display:flex;flex-direction:column;gap:6px">${metaHtml}<strong style="color:inherit;font-size:15px;line-height:1.35;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${title}</strong>${descriptionHtml}</span></a></div>`;
+};
+
+const requestLinkPreview = (apiUrl: string, axiosInstance: AxiosInstance, url: string) => {
+    return axiosInstance
+        .get(apiUrl + (apiUrl.includes("?") ? "&" : "?") + "url=" + encodeURIComponent(url), {showError: false} as never)
+        .then((response) => {
+            const responseData = response.data;
+            if (responseData && responseData.data) {
+                return responseData.data as LinkPreviewData;
+            }
+            return responseData as LinkPreviewData;
+        })
+        .catch(() => null);
+};
+
+const withLinkPreviewCards = async (markdownValue: string, options?: MarkdownRenderOptions) => {
+    if (!isLinkPreviewEnabled(options?.linkPreview)) {
+        return markdownValue;
+    }
+    const apiUrl = getLinkPreviewApiUrl(options?.linkPreview);
+    const axiosInstance = options?.axiosInstance;
+    if (!apiUrl || !axiosInstance) {
+        return markdownValue;
+    }
+    const lines = markdownValue.split(/\r?\n/);
+    const replacements = new Map<number, string>();
+    let fencedCode = false;
+    const tasks: Promise<void>[] = [];
+    lines.forEach((line, index) => {
+        const trimmed = line.trim();
+        if (/^(```|~~~)/.test(trimmed)) {
+            fencedCode = !fencedCode;
+            return;
+        }
+        if (fencedCode || line !== trimmed || !standaloneUrlPattern.test(trimmed)) {
+            return;
+        }
+        const cacheKey = apiUrl + "|" + trimmed;
+        let request = linkPreviewCache.get(cacheKey);
+        if (!request) {
+            request = requestLinkPreview(apiUrl, axiosInstance, trimmed);
+            linkPreviewCache.set(cacheKey, request);
+        }
+        tasks.push(request.then((preview) => {
+            if (!preview || preview.available === false) {
+                return;
+            }
+            replacements.set(index, linkPreviewCardHtml({...preview, url: preview.url || trimmed}));
+        }));
+    });
+    await Promise.all(tasks);
+    if (replacements.size === 0) {
+        return markdownValue;
+    }
+    return lines.map((line, index) => replacements.get(index) || line).join("\n");
+};
+
+export const markdownToHtml = async (markdownValue: string, options?: MarkdownRenderOptions) => {
+    const container = markdownRenderToDiv(await withLinkPreviewCards(markdownValue, options));
     await hydrateCodeBlocks(container);
     return renderTex(container.innerHTML);
 };
 
-export const markdownToHtmlSyncWithCallback = (markdownValue: string, onSuccess: (realHtmlStr: string) => void) => {
+export const markdownToHtmlSyncWithCallback = (markdownValue: string, onSuccess: (realHtmlStr: string) => void, options?: MarkdownRenderOptions) => {
     const container = markdownRenderToDiv(markdownValue);
-    hydrateCodeBlocks(container).then(() => {
-        onSuccess(renderTex(container.innerHTML));
+    withLinkPreviewCards(markdownValue, options).then((value) => {
+        const realContainer = markdownRenderToDiv(value);
+        hydrateCodeBlocks(realContainer).then(() => {
+            onSuccess(renderTex(realContainer.innerHTML));
+        });
     });
     return renderTex(container.innerHTML);
 };

@@ -22,6 +22,21 @@ export type ChangedContent = {
     value: string;
 }
 
+export type LinkPreviewData = {
+    url: string;
+    title?: string;
+    description?: string;
+    image?: string;
+    siteName?: string;
+    domain?: string;
+    available?: boolean;
+}
+
+export type LinkPreviewConfig = {
+    enabled?: boolean;
+    apiUrl?: string;
+}
+
 export type AIConfig = {
     aiProvider: AIProviderType;
     sessionId: number;
@@ -63,6 +78,7 @@ export type EditorConfig = {
     preview: boolean;
     mode?: EditorMode;
     onPreviewChange?: (preview: boolean) => void;
+    linkPreview?: boolean | LinkPreviewConfig;
     uploadConfig: UploadConfig;
     axiosInstance?: AxiosInstance;
 };
