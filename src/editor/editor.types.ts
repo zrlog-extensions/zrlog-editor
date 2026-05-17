@@ -35,6 +35,7 @@ export type LinkPreviewData = {
 export type LinkPreviewConfig = {
     enabled?: boolean;
     apiUrl?: string;
+    requestDelay?: number;
 }
 
 export type AIConfig = {

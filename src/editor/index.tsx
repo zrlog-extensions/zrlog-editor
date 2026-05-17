@@ -110,6 +110,8 @@ const Editor: FunctionComponent<ZrLogEditorProps> = ({
 
     const editorRef = useRef<EditorView | null>(null);
     const previewRef = useRef<HTMLDivElement | null>(null);
+    const renderSeqRef = useRef(0);
+    const linkPreviewAbortRef = useRef<AbortController | null>(null);
 
     const [messageApi, contextHolder] = useMessage({maxCount: 3, getContainer: getContainer});
 
@@ -322,7 +324,19 @@ const Editor: FunctionComponent<ZrLogEditorProps> = ({
                             onViewChange();
                         }}
                         onChange={async (value) => {
-                            const html = await markdownToHtml(value, {linkPreview: config.linkPreview, axiosInstance});
+                            linkPreviewAbortRef.current?.abort();
+                            const abortController = new AbortController();
+                            linkPreviewAbortRef.current = abortController;
+                            const renderSeq = renderSeqRef.current + 1;
+                            renderSeqRef.current = renderSeq;
+                            const html = await markdownToHtml(value, {
+                                linkPreview: config.linkPreview,
+                                axiosInstance,
+                                abortSignal: abortController.signal,
+                            });
+                            if (abortController.signal.aborted || renderSeq !== renderSeqRef.current) {
+                                return;
+                            }
                             //console.info(html + "=..");
 
                             const changeValues = {

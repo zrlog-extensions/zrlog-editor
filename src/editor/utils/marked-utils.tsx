@@ -19,6 +19,7 @@ const linkPreviewCache = new Map<string, Promise<LinkPreviewData | null | undefi
 export type MarkdownRenderOptions = {
     linkPreview?: boolean | LinkPreviewConfig;
     axiosInstance?: AxiosInstance;
+    abortSignal?: AbortSignal;
 }
 
 function renderDiagramReact(el: Element, content: JSX.Element) {
@@ -147,6 +148,62 @@ const getLinkPreviewApiUrl = (linkPreview?: boolean | LinkPreviewConfig) => {
     return linkPreview.apiUrl || "";
 };
 
+const getLinkPreviewRequestDelay = (linkPreview?: boolean | LinkPreviewConfig) => {
+    if (!linkPreview || typeof linkPreview === "boolean") {
+        return 500;
+    }
+    return linkPreview.requestDelay ?? 500;
+};
+
+const waitForRequestDelay = (delay: number, abortSignal?: AbortSignal) => {
+    if (delay <= 0) {
+        return Promise.resolve();
+    }
+    return new Promise<void>((resolve, reject) => {
+        if (abortSignal?.aborted) {
+            reject(new DOMException("Aborted", "AbortError"));
+            return;
+        }
+        const timer = window.setTimeout(() => {
+            abortSignal?.removeEventListener("abort", handleAbort);
+            resolve();
+        }, delay);
+        const handleAbort = () => {
+            window.clearTimeout(timer);
+            reject(new DOMException("Aborted", "AbortError"));
+        };
+        abortSignal?.addEventListener("abort", handleAbort, {once: true});
+    });
+};
+
+const isIpv4Host = (hostname: string) => /^\d{1,3}(\.\d{1,3}){3}$/.test(hostname);
+
+const isIpv6Host = (hostname: string) => hostname.includes(":");
+
+const isRequestableUrl = (value: string) => {
+    try {
+        const url = new URL(value);
+        if (url.protocol !== "http:" && url.protocol !== "https:") {
+            return false;
+        }
+        const hostname = url.hostname.toLowerCase();
+        if (!hostname || hostname === "localhost" || hostname.endsWith(".localhost") || hostname.endsWith(".")) {
+            return false;
+        }
+        if (isIpv4Host(hostname) || isIpv6Host(hostname)) {
+            return true;
+        }
+        if (!hostname.includes(".")) {
+            return false;
+        }
+        const parts = hostname.split(".");
+        const topLevelDomain = parts[parts.length - 1];
+        return topLevelDomain.length >= 2;
+    } catch (e) {
+        return false;
+    }
+};
+
 const escapeHtml = (value?: string) => {
     return (value || "")
         .replace(/&/g, "&amp;")
@@ -176,9 +233,16 @@ const linkPreviewCardHtml = (preview: LinkPreviewData) => {
     return `<div class="zrlog-link-preview-card" data-zrlog-link-preview-url="${url}" style="margin:0 0 1rem"><a href="${url}" target="_blank" rel="noreferrer" style="display:flex;gap:12px;color:inherit;text-decoration:none;border:1px solid rgba(127,127,127,.35);border-radius:10px;overflow:hidden">${imageHtml}<span style="min-width:0;padding:${image ? "12px 12px 12px 0" : "12px"};display:flex;flex-direction:column;gap:6px">${metaHtml}<strong style="color:inherit;font-size:15px;line-height:1.35;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${title}</strong>${descriptionHtml}</span></a></div>`;
 };
 
-const requestLinkPreview = (apiUrl: string, axiosInstance: AxiosInstance, url: string) => {
+const isCanceledRequest = (error: any) => {
+    return error?.code === "ERR_CANCELED" || error?.name === "CanceledError" || error?.name === "AbortError";
+};
+
+const requestLinkPreview = (apiUrl: string, axiosInstance: AxiosInstance, url: string, abortSignal?: AbortSignal) => {
     return axiosInstance
-        .get(apiUrl + (apiUrl.includes("?") ? "&" : "?") + "url=" + encodeURIComponent(url), {showError: false} as never)
+        .get(apiUrl + (apiUrl.includes("?") ? "&" : "?") + "url=" + encodeURIComponent(url), {
+            showError: false,
+            signal: abortSignal,
+        } as never)
         .then((response) => {
             const responseData = response.data;
             if (responseData && responseData.data) {
@@ -208,13 +272,20 @@ const withLinkPreviewCards = async (markdownValue: string, options?: MarkdownRen
             fencedCode = !fencedCode;
             return;
         }
-        if (fencedCode || line !== trimmed || !standaloneUrlPattern.test(trimmed)) {
+        if (fencedCode || line !== trimmed || !standaloneUrlPattern.test(trimmed) || !isRequestableUrl(trimmed)) {
             return;
         }
         const cacheKey = apiUrl + "|" + trimmed;
         let request = linkPreviewCache.get(cacheKey);
         if (!request) {
-            request = requestLinkPreview(apiUrl, axiosInstance, trimmed);
+            request = waitForRequestDelay(getLinkPreviewRequestDelay(options.linkPreview), options.abortSignal)
+                .then(() => requestLinkPreview(apiUrl, axiosInstance, trimmed, options.abortSignal))
+                .catch((error) => {
+                if (isCanceledRequest(error)) {
+                    linkPreviewCache.delete(cacheKey);
+                }
+                return null;
+            });
             linkPreviewCache.set(cacheKey, request);
         }
         tasks.push(request.then((preview) => {
