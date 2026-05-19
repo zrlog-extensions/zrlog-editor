@@ -75,6 +75,8 @@ export type EditorConfig = {
     dark: boolean;
     lang: Locale;
     disableToolbar?: boolean;
+    disableStatusBar?: boolean;
+    /** @deprecated use disableStatusBar */
     disableStatistics?: boolean;
     preview: boolean;
     mode?: EditorMode;

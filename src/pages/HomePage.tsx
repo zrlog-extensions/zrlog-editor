@@ -3,7 +3,7 @@ import Editor from "../editor";
 import {lang} from "./ConfigProviderApp";
 import {Card, Layout} from "antd";
 import {marked} from "marked";
-import EditorStatistics from "../editor/editor-statistics-info";
+import EditorStatusBar from "../editor/editor-status-bar";
 import {toStatisticsByMarkdown} from "../editor/utils/editor-utils";
 import {FunctionComponent, useState} from "react";
 import axios from "axios";
@@ -49,7 +49,7 @@ const HomePage: FunctionComponent<TestMarkdownEditorProps> = ({dark}) => {
 
     const editorConfig = {
         disableToolbar: false,
-        disableStatistics: false,
+        disableStatusBar: false,
         dark: dark,
         preview: true,
         lang: lang,
@@ -96,7 +96,7 @@ const HomePage: FunctionComponent<TestMarkdownEditorProps> = ({dark}) => {
 
             />
 
-            {!editorConfig.disableStatistics && <EditorStatistics data={
+            {!editorConfig.disableStatusBar && <EditorStatusBar data={
                 toStatisticsByMarkdown(value)
             } offline={false} rubbish={false} lastUpdateDate={new Date().getTime()}
                                                                   dark={dark}/>

@@ -221,9 +221,11 @@ const Editor: FunctionComponent<ZrLogEditorProps> = ({
         //setToolbar((prev) => ({ ...prev, visible: false }));
     };
 
+    const disableStatusBar = config.disableStatusBar ?? config.disableStatistics;
+
     return (
         <StyledEditor mainColor={config.colorPrimary ? config.colorPrimary : ""} dark={config.dark}
-                      style={{paddingBottom: config.disableStatistics ? 0 : 30}}>
+                      style={{paddingBottom: disableStatusBar ? 0 : 30}}>
             {editorRef.current && (
                 <PasteUpload
                     uploadConfig={config.uploadConfig}

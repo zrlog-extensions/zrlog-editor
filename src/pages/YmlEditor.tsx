@@ -3,7 +3,7 @@ import Editor from "../editor";
 import {lang} from "./ConfigProviderApp";
 import {Card, Layout} from "antd";
 import {marked} from "marked";
-import EditorStatistics from "../editor/editor-statistics-info";
+import EditorStatusBar from "../editor/editor-status-bar";
 import {toStatisticsByMarkdown} from "../editor/utils/editor-utils";
 import {FunctionComponent, useState} from "react";
 import axios from "axios";
@@ -26,7 +26,7 @@ const YmlEditor: FunctionComponent<TestMarkdownEditorProps> = ({dark}) => {
 
     const editorConfig = {
         disableToolbar: true,
-        disableStatistics: true,
+        disableStatusBar: true,
         dark: dark,
         preview: false,
         lang: lang,
@@ -68,7 +68,7 @@ const YmlEditor: FunctionComponent<TestMarkdownEditorProps> = ({dark}) => {
 
             />
 
-            {!editorConfig.disableStatistics && <EditorStatistics data={
+            {!editorConfig.disableStatusBar && <EditorStatusBar data={
                 toStatisticsByMarkdown(value)
             } offline={false} rubbish={false} lastUpdateDate={new Date().getTime()}
                                                                   dark={dark}/>

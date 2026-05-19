@@ -1,4 +1,4 @@
-import {EditorStatisticsInfo} from "../editor-statistics-info";
+import {EditorStatusBarInfo} from "../editor-status-bar";
 
 export function copyToClipboard(html: string) {
     const temp = document.createElement("input") as HTMLInputElement;
@@ -9,7 +9,7 @@ export function copyToClipboard(html: string) {
     temp.remove();
 }
 
-export const toStatisticsByMarkdown = (markdownStr?: string): EditorStatisticsInfo => {
+export const toStatisticsByMarkdown = (markdownStr?: string): EditorStatusBarInfo => {
     return {
         contentWordsLength: markdownStr?.length ? markdownStr.length : 0,
         contentLinesLength: markdownStr?.length ? (markdownStr.length > 0 ? markdownStr.split("\n").length : 0) : 0,
