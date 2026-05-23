@@ -1,7 +1,17 @@
 import AIDrawer, {getAiDrawerOpen} from "./AIDrawer";
 import {Link} from "react-router-dom";
 import {AIProviderType, EditorUser} from "../type";
-import {CSSProperties, FunctionComponent, PropsWithChildren, ReactNode, RefObject, useState} from "react";
+import {
+    CSSProperties,
+    FunctionComponent,
+    MutableRefObject,
+    PropsWithChildren,
+    ReactNode,
+    RefObject,
+    useEffect,
+    useRef,
+    useState
+} from "react";
 import Popconfirm from "antd/es/popconfirm";
 import AIContentItem, {AIContent} from "./AIContentItem";
 import {getEditorRes} from "../editor/lang/editor-lang";
@@ -13,6 +23,12 @@ export type AIButtonRenderMessageOptions = {
     content: AIContent;
     index: number;
     defaultNode: ReactNode;
+};
+
+export type AIButtonScrollCache = {
+    key: string;
+    read: (key: string) => number | undefined;
+    write: (key: string, scrollTop: number) => void;
 };
 
 type AIButtonProps = PropsWithChildren & {
@@ -39,6 +55,7 @@ type AIButtonProps = PropsWithChildren & {
     contentScrollRef?: RefObject<HTMLDivElement>;
     contentEndRef?: RefObject<HTMLDivElement>;
     contentMaxWidth?: number;
+    scrollCache?: AIButtonScrollCache;
     disabled?: boolean;
     triggerClassName?: string;
     triggerLabel?: ReactNode;
@@ -78,6 +95,7 @@ const AIButton: FunctionComponent<AIButtonProps> = ({
                                                         contentScrollRef,
                                                         contentEndRef,
                                                         contentMaxWidth = DEFAULT_CONTENT_MAX_WIDTH,
+                                                        scrollCache,
                                                         disabled,
                                                         triggerClassName,
                                                         triggerLabel,
@@ -93,6 +111,11 @@ const AIButton: FunctionComponent<AIButtonProps> = ({
     const {token} = theme.useToken();
     const extensibleMode = messages !== undefined || renderMessage !== undefined || footer !== undefined;
     const realOpen = controlledOpen === undefined ? aiOpen : controlledOpen;
+    const internalContentScrollRef = useRef<HTMLDivElement | null>(null);
+    const internalContentEndRef = useRef<HTMLDivElement | null>(null);
+    const restoredScrollCacheKeyRef = useRef<string>();
+    const scrollWriteFrameRef = useRef<number>();
+    const lastMessageLengthRef = useRef(0);
 
     const changeOpen = (nextOpen: boolean) => {
         if (controlledOpen === undefined) {
@@ -107,9 +130,76 @@ const AIButton: FunctionComponent<AIButtonProps> = ({
     };
 
     const close = () => {
-        onContentScroll?.();
+        saveScrollTop();
         changeOpen(false);
     };
+
+    const setContentScrollElement = (el: HTMLDivElement | null) => {
+        internalContentScrollRef.current = el;
+        if (contentScrollRef) {
+            (contentScrollRef as MutableRefObject<HTMLDivElement | null>).current = el;
+        }
+    };
+
+    const setContentEndElement = (el: HTMLDivElement | null) => {
+        internalContentEndRef.current = el;
+        if (contentEndRef) {
+            (contentEndRef as MutableRefObject<HTMLDivElement | null>).current = el;
+        }
+    };
+
+    const saveScrollTop = () => {
+        const scrollElement = internalContentScrollRef.current;
+        if (!scrollElement || !scrollCache) {
+            onContentScroll?.();
+            return;
+        }
+        if (scrollWriteFrameRef.current) {
+            cancelAnimationFrame(scrollWriteFrameRef.current);
+        }
+        scrollWriteFrameRef.current = requestAnimationFrame(() => {
+            scrollCache.write(scrollCache.key, scrollElement.scrollTop);
+            scrollWriteFrameRef.current = undefined;
+        });
+        onContentScroll?.();
+    };
+
+    useEffect(() => {
+        if (!realOpen || !scrollCache) {
+            return;
+        }
+        const scrollElement = internalContentScrollRef.current;
+        if (!scrollElement) {
+            return;
+        }
+        if (restoredScrollCacheKeyRef.current !== scrollCache.key) {
+            restoredScrollCacheKeyRef.current = scrollCache.key;
+            const cachedScrollTop = scrollCache.read(scrollCache.key);
+            const restoreScroll = () => {
+                if (typeof cachedScrollTop === "number") {
+                    scrollElement.scrollTop = cachedScrollTop;
+                    return;
+                }
+                scrollElement.scrollTop = scrollElement.scrollHeight;
+            };
+            requestAnimationFrame(restoreScroll);
+            window.setTimeout(restoreScroll, 120);
+            lastMessageLengthRef.current = (messages ?? []).length;
+            return;
+        }
+        if ((messages ?? []).length > lastMessageLengthRef.current) {
+            internalContentEndRef.current?.scrollIntoView({block: "end"});
+        }
+        lastMessageLengthRef.current = (messages ?? []).length;
+    }, [messages, realOpen, scrollCache]);
+
+    useEffect(() => {
+        return () => {
+            if (scrollWriteFrameRef.current) {
+                cancelAnimationFrame(scrollWriteFrameRef.current);
+            }
+        };
+    }, []);
 
     const renderDefaultMessage = (content: AIContent) => (
         <AIContentItem content={content} aiProvider={aiProvider} user={user} dark={dark}/>
@@ -129,9 +219,9 @@ const AIButton: FunctionComponent<AIButtonProps> = ({
         >
             <div style={{display: "flex", flexDirection: "column", height: "100%"}}>
                 <div
-                    ref={contentScrollRef}
+                    ref={setContentScrollElement}
                     style={{flex: 1, overflowY: "auto", padding: 12}}
-                    onScroll={onContentScroll}
+                    onScroll={saveScrollTop}
                 >
                     <div style={{maxWidth: contentMaxWidth, margin: "0 auto", width: "100%"}}>
                         {(messages ?? []).map((content, index) => {
@@ -142,7 +232,7 @@ const AIButton: FunctionComponent<AIButtonProps> = ({
                                 </div>
                             );
                         })}
-                        <div ref={contentEndRef}/>
+                        <div ref={setContentEndElement}/>
                     </div>
                 </div>
                 {footer && (
