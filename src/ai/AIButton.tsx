@@ -67,6 +67,12 @@ type AIButtonProps = PropsWithChildren & {
 const DEFAULT_CONTENT_MAX_WIDTH = 768;
 const SCROLL_TOP_STATE_KEY = "scrollTop";
 
+type PendingScrollRestore = {
+    key: string;
+    value: unknown;
+    attempts: number;
+};
+
 export const getAIButtonDrawerOpen = getAiDrawerOpen;
 
 const AIButton: FunctionComponent<AIButtonProps> = ({
@@ -113,6 +119,9 @@ const AIButton: FunctionComponent<AIButtonProps> = ({
     const internalContentEndRef = useRef<HTMLDivElement | null>(null);
     const restoredScrollCacheKeyRef = useRef<string>();
     const scrollWriteFrameRef = useRef<number>();
+    const scrollRestoreTimerRef = useRef<number>();
+    const pendingScrollRestoreRef = useRef<PendingScrollRestore>();
+    const restoringScrollRef = useRef(false);
     const lastMessageLengthRef = useRef(0);
 
     const changeOpen = (nextOpen: boolean) => {
@@ -128,7 +137,7 @@ const AIButton: FunctionComponent<AIButtonProps> = ({
     };
 
     const close = () => {
-        saveScrollTop();
+        saveScrollTop(true);
         changeOpen(false);
     };
 
@@ -146,25 +155,55 @@ const AIButton: FunctionComponent<AIButtonProps> = ({
         }
     };
 
-    const saveScrollTop = () => {
+    const saveScrollTop = (immediate = false) => {
         const scrollElement = internalContentScrollRef.current;
-        if (!scrollElement || !stateCache) {
+        if (!scrollElement || !stateCache || restoringScrollRef.current || pendingScrollRestoreRef.current) {
             onContentScroll?.();
             return;
         }
         if (scrollWriteFrameRef.current) {
             cancelAnimationFrame(scrollWriteFrameRef.current);
         }
-        scrollWriteFrameRef.current = requestAnimationFrame(() => {
+        const writeScrollTop = () => {
             stateCache.write(getAIStateCacheKey(stateCache, SCROLL_TOP_STATE_KEY), scrollElement.scrollTop);
             scrollWriteFrameRef.current = undefined;
+        };
+        if (immediate) {
+            writeScrollTop();
+            onContentScroll?.();
+            return;
+        }
+        scrollWriteFrameRef.current = requestAnimationFrame(() => {
+            writeScrollTop();
         });
         onContentScroll?.();
+    };
+
+    const restoreScroll = (scrollElement: HTMLDivElement, pendingRestore: PendingScrollRestore) => {
+        const cachedScrollTop = pendingRestore.value;
+        restoringScrollRef.current = true;
+        if (typeof cachedScrollTop === "number") {
+            const maxScrollTop = Math.max(0, scrollElement.scrollHeight - scrollElement.clientHeight);
+            scrollElement.scrollTop = Math.min(cachedScrollTop, maxScrollTop);
+            pendingRestore.attempts += 1;
+            if (cachedScrollTop <= maxScrollTop || cachedScrollTop === 0 || (maxScrollTop > 0 && pendingRestore.attempts >= 3)) {
+                pendingScrollRestoreRef.current = undefined;
+            }
+        } else {
+            scrollElement.scrollTop = scrollElement.scrollHeight;
+            if (scrollElement.scrollHeight > scrollElement.clientHeight || (messages ?? []).length > 0) {
+                pendingScrollRestoreRef.current = undefined;
+            }
+        }
+        window.setTimeout(() => {
+            restoringScrollRef.current = false;
+        }, 0);
     };
 
     useEffect(() => {
         if (!realOpen || !stateCache) {
             restoredScrollCacheKeyRef.current = undefined;
+            pendingScrollRestoreRef.current = undefined;
             return;
         }
         const scrollElement = internalContentScrollRef.current;
@@ -174,20 +213,21 @@ const AIButton: FunctionComponent<AIButtonProps> = ({
         const scrollCacheKey = getAIStateCacheKey(stateCache, SCROLL_TOP_STATE_KEY);
         if (restoredScrollCacheKeyRef.current !== scrollCacheKey) {
             restoredScrollCacheKeyRef.current = scrollCacheKey;
-            const cachedScrollTop = stateCache.read(scrollCacheKey);
-            const restoreScroll = () => {
-                if (typeof cachedScrollTop === "number") {
-                    scrollElement.scrollTop = cachedScrollTop;
-                    return;
-                }
-                scrollElement.scrollTop = scrollElement.scrollHeight;
+            pendingScrollRestoreRef.current = {
+                key: scrollCacheKey,
+                value: stateCache.read(scrollCacheKey),
+                attempts: 0,
             };
-            requestAnimationFrame(restoreScroll);
-            window.setTimeout(restoreScroll, 120);
             lastMessageLengthRef.current = (messages ?? []).length;
-            return;
         }
-        if ((messages ?? []).length > lastMessageLengthRef.current) {
+        if (pendingScrollRestoreRef.current?.key === scrollCacheKey) {
+            const pendingRestore = pendingScrollRestoreRef.current;
+            requestAnimationFrame(() => restoreScroll(scrollElement, pendingRestore));
+            if (scrollRestoreTimerRef.current) {
+                clearTimeout(scrollRestoreTimerRef.current);
+            }
+            scrollRestoreTimerRef.current = window.setTimeout(() => restoreScroll(scrollElement, pendingRestore), 120);
+        } else if ((messages ?? []).length > lastMessageLengthRef.current) {
             internalContentEndRef.current?.scrollIntoView({block: "end"});
         }
         lastMessageLengthRef.current = (messages ?? []).length;
@@ -197,6 +237,9 @@ const AIButton: FunctionComponent<AIButtonProps> = ({
         return () => {
             if (scrollWriteFrameRef.current) {
                 cancelAnimationFrame(scrollWriteFrameRef.current);
+            }
+            if (scrollRestoreTimerRef.current) {
+                clearTimeout(scrollRestoreTimerRef.current);
             }
         };
     }, []);
@@ -222,7 +265,7 @@ const AIButton: FunctionComponent<AIButtonProps> = ({
                 <div
                     ref={setContentScrollElement}
                     style={{flex: 1, overflowY: "auto", padding: 12}}
-                    onScroll={saveScrollTop}
+                    onScroll={() => saveScrollTop()}
                 >
                     <div style={{maxWidth: contentMaxWidth, margin: "0 auto", width: "100%"}}>
                         {(messages ?? []).map((content, index) => {
