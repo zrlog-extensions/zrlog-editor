@@ -18,17 +18,14 @@ import {getEditorRes} from "../editor/lang/editor-lang";
 import {AxiosInstance} from "axios";
 import {Button, theme} from "antd";
 import AIIcon from "./AIIcon";
+import {AIStateCache, getAIStateCacheKey} from "./AIStateCache";
+
+export type {AIStateCache} from "./AIStateCache";
 
 export type AIButtonRenderMessageOptions = {
     content: AIContent;
     index: number;
     defaultNode: ReactNode;
-};
-
-export type AIButtonScrollCache = {
-    key: string;
-    read: (key: string) => number | undefined;
-    write: (key: string, scrollTop: number) => void;
 };
 
 type AIButtonProps = PropsWithChildren & {
@@ -55,7 +52,7 @@ type AIButtonProps = PropsWithChildren & {
     contentScrollRef?: RefObject<HTMLDivElement>;
     contentEndRef?: RefObject<HTMLDivElement>;
     contentMaxWidth?: number;
-    scrollCache?: AIButtonScrollCache;
+    stateCache?: AIStateCache;
     disabled?: boolean;
     triggerClassName?: string;
     triggerLabel?: ReactNode;
@@ -68,6 +65,7 @@ type AIButtonProps = PropsWithChildren & {
 };
 
 const DEFAULT_CONTENT_MAX_WIDTH = 768;
+const SCROLL_TOP_STATE_KEY = "scrollTop";
 
 export const getAIButtonDrawerOpen = getAiDrawerOpen;
 
@@ -95,7 +93,7 @@ const AIButton: FunctionComponent<AIButtonProps> = ({
                                                         contentScrollRef,
                                                         contentEndRef,
                                                         contentMaxWidth = DEFAULT_CONTENT_MAX_WIDTH,
-                                                        scrollCache,
+                                                        stateCache,
                                                         disabled,
                                                         triggerClassName,
                                                         triggerLabel,
@@ -150,7 +148,7 @@ const AIButton: FunctionComponent<AIButtonProps> = ({
 
     const saveScrollTop = () => {
         const scrollElement = internalContentScrollRef.current;
-        if (!scrollElement || !scrollCache) {
+        if (!scrollElement || !stateCache) {
             onContentScroll?.();
             return;
         }
@@ -158,23 +156,24 @@ const AIButton: FunctionComponent<AIButtonProps> = ({
             cancelAnimationFrame(scrollWriteFrameRef.current);
         }
         scrollWriteFrameRef.current = requestAnimationFrame(() => {
-            scrollCache.write(scrollCache.key, scrollElement.scrollTop);
+            stateCache.write(getAIStateCacheKey(stateCache, SCROLL_TOP_STATE_KEY), scrollElement.scrollTop);
             scrollWriteFrameRef.current = undefined;
         });
         onContentScroll?.();
     };
 
     useEffect(() => {
-        if (!realOpen || !scrollCache) {
+        if (!realOpen || !stateCache) {
             return;
         }
         const scrollElement = internalContentScrollRef.current;
         if (!scrollElement) {
             return;
         }
-        if (restoredScrollCacheKeyRef.current !== scrollCache.key) {
-            restoredScrollCacheKeyRef.current = scrollCache.key;
-            const cachedScrollTop = scrollCache.read(scrollCache.key);
+        const scrollCacheKey = getAIStateCacheKey(stateCache, SCROLL_TOP_STATE_KEY);
+        if (restoredScrollCacheKeyRef.current !== scrollCacheKey) {
+            restoredScrollCacheKeyRef.current = scrollCacheKey;
+            const cachedScrollTop = stateCache.read(scrollCacheKey);
             const restoreScroll = () => {
                 if (typeof cachedScrollTop === "number") {
                     scrollElement.scrollTop = cachedScrollTop;
@@ -191,7 +190,7 @@ const AIButton: FunctionComponent<AIButtonProps> = ({
             internalContentEndRef.current?.scrollIntoView({block: "end"});
         }
         lastMessageLengthRef.current = (messages ?? []).length;
-    }, [messages, realOpen, scrollCache]);
+    }, [messages, realOpen, stateCache]);
 
     useEffect(() => {
         return () => {
@@ -216,6 +215,7 @@ const AIButton: FunctionComponent<AIButtonProps> = ({
             defaultWidth={drawerWidth}
             getContainer={getContainer}
             onSizeChange={onSizeChange}
+            stateCache={stateCache}
         >
             <div style={{display: "flex", flexDirection: "column", height: "100%"}}>
                 <div
@@ -301,6 +301,7 @@ const AIButton: FunctionComponent<AIButtonProps> = ({
                     getContainer={getContainer}
                     axiosInstance={axiosInstance}
                     onSizeChange={onSizeChange}
+                    stateCache={stateCache}
                 />
             )}
             <Popconfirm

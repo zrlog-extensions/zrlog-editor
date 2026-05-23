@@ -9,6 +9,7 @@ import AIChatContentPanel from "./AIChatContentPanel";
 import {getEditorRes} from "../editor/lang/editor-lang";
 import {AxiosInstance} from "axios";
 import AIInput from "./AIInput";
+import {AIStateCache, getAIStateCacheKey} from "./AIStateCache";
 
 type AIDrawerProps = {
     input?: string;
@@ -31,6 +32,7 @@ type AIDrawerProps = {
     bodyPadding?: number;
     bodyOverflow?: "hidden" | "auto";
     onSizeChange?: (size: number) => void;
+    stateCache?: AIStateCache;
 };
 
 type AIDrawerState = {
@@ -54,6 +56,12 @@ const resolveDrawerWidth = (width?: number | "default" | "large") => {
     return "large";
 };
 
+const isDrawerWidth = (width: unknown): width is number | "default" | "large" => {
+    return typeof width === "number" || width === "default" || width === "large";
+};
+
+const DRAWER_WIDTH_STATE_KEY = "drawerWidth";
+
 const AIDrawer: FunctionComponent<AIDrawerProps> = ({
                                                        sessionId,
                                                        input,
@@ -76,9 +84,20 @@ const AIDrawer: FunctionComponent<AIDrawerProps> = ({
                                                        open,
                                                        bodyPadding,
                                                        bodyOverflow = "hidden",
+                                                       stateCache,
                                                    }) => {
     const legacyMode = children === undefined;
-    const [size, setSize] = useState<string | number>(resolveDrawerWidth(defaultWidth));
+    const getDrawerWidthFromCache = () => {
+        if (!stateCache) {
+            return resolveDrawerWidth(defaultWidth);
+        }
+        const cachedWidth = stateCache.read(getAIStateCacheKey(stateCache, DRAWER_WIDTH_STATE_KEY));
+        if (isDrawerWidth(cachedWidth)) {
+            return resolveDrawerWidth(cachedWidth);
+        }
+        return resolveDrawerWidth(defaultWidth);
+    };
+    const [size, setSize] = useState<string | number>(getDrawerWidthFromCache);
     const [state, setState] = useState<AIDrawerState>({
         open: open !== undefined ? open : !hide,
         contents: aiMessages
@@ -96,8 +115,8 @@ const AIDrawer: FunctionComponent<AIDrawerProps> = ({
     }, [hide, open]);
 
     useEffect(() => {
-        setSize(resolveDrawerWidth(defaultWidth));
-    }, [defaultWidth]);
+        setSize(getDrawerWidthFromCache());
+    }, [defaultWidth, stateCache?.key]);
 
     useEffect(() => {
         window[cacheKey] = state.open;
@@ -163,10 +182,14 @@ const AIDrawer: FunctionComponent<AIDrawerProps> = ({
                 screens.sm
                     ? {
                         onResize: (nextWidth) => {
+                            const nextSize = nextWidth <= 378 ? "default" : nextWidth;
                             if (nextWidth <= 378) {
                                 setSize("default");
                             } else {
                                 setSize(nextWidth);
+                            }
+                            if (stateCache) {
+                                stateCache.write(getAIStateCacheKey(stateCache, DRAWER_WIDTH_STATE_KEY), nextSize);
                             }
                             onSizeChange?.(nextWidth);
                         },
