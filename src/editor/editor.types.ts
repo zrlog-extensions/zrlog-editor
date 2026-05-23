@@ -3,6 +3,7 @@ import {AIContent} from "../ai/AIContentItem";
 import {Locale} from "./lang/editor-lang";
 import {AxiosInstance} from "axios";
 import {EditorView} from "@uiw/react-codemirror";
+import {AIStateCache} from "../ai/AIStateCache";
 
 export type ZrLogEditorProps = {
     height: any;
@@ -47,6 +48,7 @@ export type AIConfig = {
     aiMessages?: AIContent[];
     user?: EditorUser
     drawerWidth?: number | "large" | "default";
+    stateCache?: AIStateCache;
     onAiMessagesChange?: (aiMessages: AIContent[]) => void;
     onSizeChange?: (size: number) => void;
 }

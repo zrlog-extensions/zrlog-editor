@@ -71,6 +71,7 @@ export const SelectionToolbar: React.FC<SelectionToolbarProps> = ({
             <EditorToolBarDivider style={{height: "1.5em"}}/>
             {aiConfig && <AIButton
                 drawerWidth={aiConfig.drawerWidth}
+                stateCache={aiConfig.stateCache}
                 dark={dark}
                 axiosInstance={axiosInstance}
                 input={selectedText}
