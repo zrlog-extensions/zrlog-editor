@@ -8,6 +8,7 @@ import {
     PropsWithChildren,
     ReactNode,
     RefObject,
+    useCallback,
     useEffect,
     useRef,
     useState
@@ -112,6 +113,7 @@ const AIButton: FunctionComponent<AIButtonProps> = ({
                                                     }) => {
     const needConfig = (aiProvider as string) === "" || aiProvider === null || aiProvider === undefined;
     const [aiOpen, setAiOpen] = useState<boolean>(false);
+    const [contentScrollElementRevision, setContentScrollElementRevision] = useState(0);
     const {token} = theme.useToken();
     const extensibleMode = messages !== undefined || renderMessage !== undefined || footer !== undefined;
     const realOpen = controlledOpen === undefined ? aiOpen : controlledOpen;
@@ -141,19 +143,22 @@ const AIButton: FunctionComponent<AIButtonProps> = ({
         changeOpen(false);
     };
 
-    const setContentScrollElement = (el: HTMLDivElement | null) => {
+    const setContentScrollElement = useCallback((el: HTMLDivElement | null) => {
         internalContentScrollRef.current = el;
         if (contentScrollRef) {
             (contentScrollRef as MutableRefObject<HTMLDivElement | null>).current = el;
         }
-    };
+        if (el) {
+            setContentScrollElementRevision((prevState) => prevState + 1);
+        }
+    }, [contentScrollRef]);
 
-    const setContentEndElement = (el: HTMLDivElement | null) => {
+    const setContentEndElement = useCallback((el: HTMLDivElement | null) => {
         internalContentEndRef.current = el;
         if (contentEndRef) {
             (contentEndRef as MutableRefObject<HTMLDivElement | null>).current = el;
         }
-    };
+    }, [contentEndRef]);
 
     const saveScrollTop = (immediate = false) => {
         const scrollElement = internalContentScrollRef.current;
@@ -198,6 +203,17 @@ const AIButton: FunctionComponent<AIButtonProps> = ({
         window.setTimeout(() => {
             restoringScrollRef.current = false;
         }, 0);
+        if (pendingScrollRestoreRef.current === pendingRestore && pendingRestore.attempts < 12) {
+            if (scrollRestoreTimerRef.current) {
+                clearTimeout(scrollRestoreTimerRef.current);
+            }
+            scrollRestoreTimerRef.current = window.setTimeout(() => {
+                const latestScrollElement = internalContentScrollRef.current;
+                if (latestScrollElement) {
+                    restoreScroll(latestScrollElement, pendingRestore);
+                }
+            }, 120);
+        }
     };
 
     useEffect(() => {
@@ -231,7 +247,7 @@ const AIButton: FunctionComponent<AIButtonProps> = ({
             internalContentEndRef.current?.scrollIntoView({block: "end"});
         }
         lastMessageLengthRef.current = (messages ?? []).length;
-    }, [messages, realOpen, stateCache]);
+    }, [messages, realOpen, stateCache, contentScrollElementRevision]);
 
     useEffect(() => {
         return () => {
