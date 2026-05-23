@@ -1,9 +1,9 @@
-import {Button, Drawer, Grid, Space, theme} from "antd";
-import {CSSProperties, FunctionComponent, ReactNode, RefObject, useEffect, useState} from "react";
+import {Button, theme} from "antd";
+import {CSSProperties, FunctionComponent, ReactNode, RefObject, useState} from "react";
 import AIIcon from "./AIIcon";
 import AIContentItem, {AIContent} from "./AIContentItem";
 import {AIProviderType, EditorUser} from "../type";
-import {getEditorRes} from "../editor/lang/editor-lang";
+import AIDrawer, {getAiDrawerOpen} from "./AIDrawer";
 
 export type EditorAiAssistantRenderMessageOptions = {
     content: AIContent;
@@ -38,19 +38,7 @@ export type EditorAiAssistantButtonProps = {
 
 const DEFAULT_CONTENT_MAX_WIDTH = 768;
 
-let editorAiAssistantDrawerOpen = false;
-
-export const getEditorAiAssistantDrawerOpen = () => editorAiAssistantDrawerOpen;
-
-const resolveDrawerWidth = (width?: number | "default" | "large") => {
-    if (typeof width === "number") {
-        return width;
-    }
-    if (width === "default") {
-        return 378;
-    }
-    return 560;
-};
+export const getEditorAiAssistantDrawerOpen = getAiDrawerOpen;
 
 const EditorAiAssistantButton: FunctionComponent<EditorAiAssistantButtonProps> = ({
                                                                                       aiProvider,
@@ -75,10 +63,8 @@ const EditorAiAssistantButton: FunctionComponent<EditorAiAssistantButtonProps> =
                                                                                       footer,
                                                                                       overlays,
                                                                                       open: controlledOpen,
-                                                                                  }) => {
+}) => {
     const [open, setOpen] = useState(false);
-    const [size, setSize] = useState(resolveDrawerWidth(drawerWidth));
-    const screens = Grid.useBreakpoint();
     const {token} = theme.useToken();
     const realOpen = controlledOpen === undefined ? open : controlledOpen;
 
@@ -88,17 +74,6 @@ const EditorAiAssistantButton: FunctionComponent<EditorAiAssistantButtonProps> =
         }
         onOpenChange?.(nextOpen);
     };
-
-    useEffect(() => {
-        editorAiAssistantDrawerOpen = realOpen;
-        return () => {
-            editorAiAssistantDrawerOpen = false;
-        };
-    }, [realOpen]);
-
-    useEffect(() => {
-        setSize(resolveDrawerWidth(drawerWidth));
-    }, [drawerWidth]);
 
     const close = () => {
         onContentScroll?.();
@@ -122,40 +97,15 @@ const EditorAiAssistantButton: FunctionComponent<EditorAiAssistantButtonProps> =
             >
                 {triggerLabel}
             </Button>
-            <Drawer
-                title={
-                    <Space>
-                        <AIIcon name={aiProvider}/>
-                        <span>{getEditorRes("ai").ai}</span>
-                        <span>{subject && subject.length > 0 ? `[ ${subject} ]` : ""}</span>
-                    </Space>
-                }
-                placement="right"
-                size={screens.sm ? size : "100%"}
-                resizable={
-                    screens.sm
-                        ? {
-                            onResize: (nextWidth) => {
-                                setSize(nextWidth);
-                                onDrawerSizeChange?.(nextWidth);
-                            },
-                        }
-                        : false
-                }
+            <AIDrawer
+                aiProvider={aiProvider}
                 open={realOpen}
-                autoFocus={false}
-                keyboard={true}
                 onClose={close}
+                defaultWidth={drawerWidth}
+                onSizeChange={onDrawerSizeChange}
                 getContainer={getContainer}
-                styles={{
-                    header: {
-                        padding: 12,
-                    },
-                    body: {
-                        padding: 0,
-                        overflow: "hidden",
-                    },
-                }}
+                subject={subject}
+                dark={dark}
             >
                 <div style={{display: "flex", flexDirection: "column", height: "100%"}}>
                     <div
@@ -187,7 +137,7 @@ const EditorAiAssistantButton: FunctionComponent<EditorAiAssistantButtonProps> =
                     )}
                 </div>
                 {overlays}
-            </Drawer>
+            </AIDrawer>
         </>
     );
 };

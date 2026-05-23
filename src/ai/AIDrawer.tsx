@@ -1,5 +1,5 @@
-import {Drawer} from "antd";
-import {FunctionComponent, useEffect, useRef, useState} from "react";
+import {Drawer, Grid, Space} from "antd";
+import {FunctionComponent, ReactNode, useEffect, useRef, useState} from "react";
 import {InfoCircleOutlined} from "@ant-design/icons";
 import {AIProviderType, EditorUser} from "../type";
 import AIIcon from "./AIIcon";
@@ -11,20 +11,25 @@ import {AxiosInstance} from "axios";
 import AIInput from "./AIInput";
 
 type AIDrawerProps = {
-    input: string;
-    sessionId: number;
-    apiUri: string;
-    onClose?: () => void;
-    hide: boolean;
-    aiProvider: AIProviderType;
-    getContainer?: () => HTMLElement;
-    subject?: string;
+    input?: string;
+    sessionId?: number;
+    apiUri?: string;
+    hide?: boolean;
     aiMessages?: AIContent[];
     onAiMessagesChange?: (messages: AIContent[]) => void;
     axiosInstance?: AxiosInstance;
-    defaultWidth?: number | "large" | "default";
-    dark: boolean;
+    dark?: boolean;
     user?: EditorUser;
+
+    aiProvider: AIProviderType;
+    children?: ReactNode;
+    open?: boolean;
+    onClose?: () => void;
+    getContainer?: () => HTMLElement;
+    subject?: string;
+    defaultWidth?: number | "large" | "default";
+    bodyPadding?: number;
+    bodyOverflow?: "hidden" | "auto";
     onSizeChange?: (size: number) => void;
 };
 
@@ -39,120 +44,93 @@ export const getAiDrawerOpen = (): boolean => {
     return window[cacheKey] === true;
 }
 
+const resolveDrawerWidth = (width?: number | "default" | "large") => {
+    if (typeof width === "number") {
+        return width;
+    }
+    if (width === "default") {
+        return 378;
+    }
+    return "large";
+};
 
 const AIDrawer: FunctionComponent<AIDrawerProps> = ({
-                                                        sessionId,
-                                                        input,
-                                                        onClose,
-                                                        getContainer,
-                                                        apiUri,
-                                                        hide,
-                                                        aiProvider,
-                                                        subject,
-                                                        aiMessages = [],
-                                                        onAiMessagesChange = () => {
-                                                            //ignore
-                                                        },
-                                                        axiosInstance,
-                                                        defaultWidth,
-                                                        dark,
-                                                        user,
-                                                        onSizeChange
-                                                    }) => {
-
-
-    const [size, setSize] = useState<string | number>(defaultWidth ? defaultWidth : "large");
-
+                                                       sessionId,
+                                                       input,
+                                                       onClose,
+                                                       getContainer,
+                                                       apiUri,
+                                                       hide,
+                                                       aiProvider,
+                                                       subject,
+                                                       aiMessages = [],
+                                                       onAiMessagesChange = () => {
+                                                           //ignore
+                                                       },
+                                                       axiosInstance,
+                                                       defaultWidth,
+                                                       dark = false,
+                                                       user,
+                                                       onSizeChange,
+                                                       children,
+                                                       open,
+                                                       bodyPadding,
+                                                       bodyOverflow = "hidden",
+                                                   }) => {
+    const legacyMode = children === undefined;
+    const [size, setSize] = useState<string | number>(resolveDrawerWidth(defaultWidth));
     const [state, setState] = useState<AIDrawerState>({
-        open: !hide,
+        open: open !== undefined ? open : !hide,
         contents: aiMessages
     });
-
+    const screens = Grid.useBreakpoint();
     const messagesEndRef = useRef<HTMLDivElement>(null);
-    const realHide = useRef<boolean>(hide);
-
 
     useEffect(() => {
         setState((prevState) => {
             return {
                 ...prevState,
-                open: !hide,
+                open: open !== undefined ? open : !hide,
             };
         });
-        realHide.current = hide;
-        window[cacheKey] = !hide;
-    }, [hide]);
+    }, [hide, open]);
+
+    useEffect(() => {
+        setSize(resolveDrawerWidth(defaultWidth));
+    }, [defaultWidth]);
 
     useEffect(() => {
         window[cacheKey] = state.open;
     }, [state.open]);
 
+    const close = () => {
+        setState((prevState) => {
+            return {
+                ...prevState,
+                open: false,
+            };
+        });
+        onClose?.();
+    };
 
-    return (
-        <Drawer
-            title={
-                <div style={{display: "flex", gap: 8, alignItems: "center"}}>
-                    <AIIcon name={aiProvider}/>
-                    <span>{getEditorRes("ai").ai} </span>
-                    <span>{subject && subject.length > 0 ? "[ " + subject + " ]" : ""}</span>
-                </div>
-            }
-            resizable={{
-                onResize: (n) => {
-                    if (n <= 378) {
-                        setSize("default");
-                    } else {
-                        setSize(n);
-                    }
-                    if (onSizeChange) {
-                        onSizeChange(n)
-                    }
-                },
-            }}
-            placement="right"
-            size={size as number}
-            closable={{placement: "end"}}
-            keyboard={true}
-            autoFocus={false}
-            onClose={() => {
-                setState((prevState) => {
-                    return {
-                        ...prevState,
-                        open: false,
-                    };
-                });
-                if (onClose) {
-                    onClose();
+    const renderLegacyContent = () => (
+        <Content>
+            <div
+                style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    overflow: "auto",
+                    width: "100%",
+                }}
+            >
+                {state.open &&
+                    <div style={{display: "flex", width: "100%", flexDirection: "column", alignItems: "center"}}>
+                        <AIChatContentPanel user={user} dark={dark} contents={state.contents}
+                                            aiProvider={aiProvider}/>
+                        <div ref={messagesEndRef} style={{height: 2}}/>
+                    </div>
                 }
-            }}
-            styles={{
-                header: {
-                    padding: 12,
-                },
-                body: {
-                    padding: 12,
-                    overflowX: "hidden",
-                },
-            }}
-            open={state.open}
-            getContainer={getContainer}
-        >
-            <Content>
-                <div
-                    style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        overflow: "auto",
-                        width: "100%",
-                    }}
-                >
-                    {state.open &&
-                        <div style={{display: "flex", width: "100%", flexDirection: "column", alignItems: "center"}}>
-                            <AIChatContentPanel user={user} dark={dark} contents={state.contents}
-                                                aiProvider={aiProvider}/>
-                            <div ref={messagesEndRef} style={{height: 2}}/>
-                        </div>
-                    }
+                {input !== undefined && apiUri !== undefined && (
                     <AIInput aiMessages={state.contents} onAiMessagesChange={(messages) => {
                         setState((prevState) => {
                             return {
@@ -160,17 +138,61 @@ const AIDrawer: FunctionComponent<AIDrawerProps> = ({
                                 contents: messages,
                             }
                         })
-                        if (onAiMessagesChange) {
-                            onAiMessagesChange(messages)
-                        }
+                        onAiMessagesChange?.(messages)
                     }} axiosInstance={axiosInstance} defaultInput={input} apiUri={apiUri} sessionId={sessionId}/>
-                    {state.contents.length > 0 && (
-                        <span style={{position: "absolute", bottom: 6, fontSize: 12}}>
-                            <InfoCircleOutlined style={{paddingRight: 4}}/> {getEditorRes("ai").contentTips}
-                        </span>
-                    )}
-                </div>
-            </Content>
+                )}
+                {state.contents.length > 0 && (
+                    <span style={{position: "absolute", bottom: 6, fontSize: 12}}>
+                        <InfoCircleOutlined style={{paddingRight: 4}}/> {getEditorRes("ai").contentTips}
+                    </span>
+                )}
+            </div>
+        </Content>
+    );
+
+    return (
+        <Drawer
+            title={
+                <Space>
+                    <AIIcon name={aiProvider}/>
+                    <span>{getEditorRes("ai").ai}</span>
+                    <span>{subject && subject.length > 0 ? `[ ${subject} ]` : ""}</span>
+                </Space>
+            }
+            resizable={
+                screens.sm
+                    ? {
+                        onResize: (nextWidth) => {
+                            if (nextWidth <= 378) {
+                                setSize("default");
+                            } else {
+                                setSize(nextWidth);
+                            }
+                            onSizeChange?.(nextWidth);
+                        },
+                    }
+                    : false
+            }
+            placement="right"
+            size={screens.sm ? size as number : "100%"}
+            closable={{placement: "end"}}
+            keyboard={true}
+            autoFocus={false}
+            onClose={close}
+            styles={{
+                header: {
+                    padding: 12,
+                },
+                body: {
+                    padding: bodyPadding === undefined ? (legacyMode ? 12 : 0) : bodyPadding,
+                    overflow: bodyOverflow,
+                    overflowX: "hidden",
+                },
+            }}
+            open={state.open}
+            getContainer={getContainer}
+        >
+            {children ?? renderLegacyContent()}
         </Drawer>
     );
 };
