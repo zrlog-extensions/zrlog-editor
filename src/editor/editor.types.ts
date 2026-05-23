@@ -4,6 +4,12 @@ import {Locale} from "./lang/editor-lang";
 import {AxiosInstance} from "axios";
 import {EditorView} from "@uiw/react-codemirror";
 import {AIStateCache} from "../ai/AIStateCache";
+import {ReactNode} from "react";
+import {AIButtonRenderMessageOptions} from "../ai/AIButton";
+
+export type AIConfigFooterOptions = {
+    selectedText?: string;
+};
 
 export type ZrLogEditorProps = {
     height: any;
@@ -49,6 +55,11 @@ export type AIConfig = {
     user?: EditorUser
     drawerWidth?: number | "large" | "default";
     stateCache?: AIStateCache;
+    messages?: AIContent[];
+    contentMaxWidth?: number;
+    renderMessage?: (options: AIButtonRenderMessageOptions) => ReactNode;
+    renderFooter?: (options: AIConfigFooterOptions) => ReactNode;
+    overlays?: ReactNode;
     onAiMessagesChange?: (aiMessages: AIContent[]) => void;
     onSizeChange?: (size: number) => void;
 }

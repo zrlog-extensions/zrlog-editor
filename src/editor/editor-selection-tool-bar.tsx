@@ -85,6 +85,11 @@ export const SelectionToolbar: React.FC<SelectionToolbarProps> = ({
                 user={aiConfig.user}
                 aiMessages={aiConfig.aiMessages}
                 onAiMessagesChange={aiConfig.onAiMessagesChange}
+                messages={aiConfig.messages}
+                contentMaxWidth={aiConfig.contentMaxWidth}
+                renderMessage={aiConfig.renderMessage}
+                footer={aiConfig.renderFooter?.({selectedText})}
+                overlays={aiConfig.overlays}
                 onOpen={() => {
                     if (onAi) {
                         onAi();
