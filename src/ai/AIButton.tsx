@@ -164,6 +164,7 @@ const AIButton: FunctionComponent<AIButtonProps> = ({
 
     useEffect(() => {
         if (!realOpen || !stateCache) {
+            restoredScrollCacheKeyRef.current = undefined;
             return;
         }
         const scrollElement = internalContentScrollRef.current;

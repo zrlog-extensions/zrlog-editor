@@ -46,7 +46,7 @@ export const getAiDrawerOpen = (): boolean => {
     return window[cacheKey] === true;
 }
 
-const resolveDrawerWidth = (width?: number | "default" | "large") => {
+export const resolveDrawerWidth = (width?: number | "default" | "large") => {
     if (typeof width === "number") {
         return width;
     }
