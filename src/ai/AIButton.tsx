@@ -372,6 +372,8 @@ const AIButton: FunctionComponent<AIButtonProps> = ({
             <Popconfirm
                 disabled={!needConfig}
                 title={getEditorRes("ai").askConfig}
+                getPopupContainer={getContainer}
+                getTooltipContainer={getContainer}
                 okText={<Link to={configUrl ? configUrl : "#miss"}>{getEditorRes("setting")}</Link>}
             >
                 {renderTrigger()}
