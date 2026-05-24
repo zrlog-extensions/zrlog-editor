@@ -46,7 +46,7 @@ export type LinkPreviewConfig = {
 }
 
 export type AIConfig = {
-    aiProvider: AIProviderType;
+    aiProvider?: AIProviderType;
     sessionId: number;
     aiApiUri: string;
     configUrl?: string

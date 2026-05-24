@@ -35,7 +35,7 @@ type AIButtonProps = PropsWithChildren & {
     apiUri?: string;
     onClose?: () => void;
     onOpen?: () => void;
-    aiProvider: AIProviderType;
+    aiProvider?: AIProviderType;
     getContainer?: () => HTMLElement;
     subject?: string;
     aiMessages?: AIContent[];
@@ -261,13 +261,13 @@ const AIButton: FunctionComponent<AIButtonProps> = ({
     }, []);
 
     const renderDefaultMessage = (content: AIContent) => (
-        <AIContentItem content={content} aiProvider={aiProvider} user={user} dark={dark}/>
+        <AIContentItem content={content} aiProvider={aiProvider as AIProviderType} user={user} dark={dark}/>
     );
 
     const renderExtensibleDrawer = () => (
         <AIDrawer
             dark={dark}
-            aiProvider={aiProvider}
+            aiProvider={aiProvider as AIProviderType}
             open={realOpen}
             subject={subject}
             onClose={close}
@@ -333,7 +333,12 @@ const AIButton: FunctionComponent<AIButtonProps> = ({
                 disabled={disabled}
                 style={triggerStyle}
                 title={triggerTitle}
-                onClick={() => changeOpen(true)}
+                onClick={() => {
+                    if (needConfig) {
+                        return;
+                    }
+                    changeOpen(true);
+                }}
             >
                 {triggerLabel}
             </Button>
@@ -342,12 +347,12 @@ const AIButton: FunctionComponent<AIButtonProps> = ({
 
     return (
         <>
-            {extensibleMode ? (
+            {!needConfig && (extensibleMode ? (
                 renderExtensibleDrawer()
             ) : (
                 <AIDrawer
                     dark={dark}
-                    aiProvider={aiProvider}
+                    aiProvider={aiProvider as AIProviderType}
                     hide={!aiOpen}
                     apiUri={apiUri}
                     input={input}
@@ -363,7 +368,7 @@ const AIButton: FunctionComponent<AIButtonProps> = ({
                     onSizeChange={onSizeChange}
                     stateCache={stateCache}
                 />
-            )}
+            ))}
             <Popconfirm
                 disabled={!needConfig}
                 title={getEditorRes("ai").askConfig}

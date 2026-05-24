@@ -4,7 +4,7 @@ import {AIProviderType} from "../type";
 import {RiGeminiFill} from "./icons/RiGeminiFill";
 
 type AIIconProps = {
-    name: AIProviderType;
+    name?: AIProviderType;
     style?: CSSProperties;
 };
 
