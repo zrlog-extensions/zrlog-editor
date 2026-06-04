@@ -1,4 +1,3 @@
-import { renderTex } from "./katex-helpers";
 import { marked } from "marked";
 
 import flowchart from "flowchart.js";
@@ -123,8 +122,153 @@ async function hydrateCodeBlocks(virtualElement: HTMLElement) {
     await Promise.all(tasks);
 }
 
+type MarkdownSegment = {
+    value: string;
+    locked: boolean;
+};
+
+type MarkdownMathToken = {
+    placeholder: string;
+    expression: string;
+    displayMode: boolean;
+};
+
+const fencedCodeLinePattern = /^(```|~~~)/;
+const inlineCodePattern = /(`+)([\s\S]*?)\1/g;
+const texBlockPattern = /\$\$([\s\S]+?)\$\$/g;
+const texInlinePattern = /(?<!\$)\$(.+?)\$(?!\$)/g;
+const cjkStrongBoundaryMarker = "<!--zrlog-cjk-strong-->";
+const cjkCharRange = "\\u3400-\\u4DBF\\u4E00-\\u9FFF\\uF900-\\uFAFF\\u3040-\\u30FF\\uAC00-\\uD7AF";
+
+const escapeRegexCharClass = (value: string) => value.replace(/[\\\]\-\^]/g, "\\$&");
+const cjkStrongBoundaryPunctuationClass = escapeRegexCharClass("'\"“”‘’「」『』（）()《》〈〉【】[]{}，。！？；：、,.!?;:");
+const cjkStrongOpenBoundaryPattern = new RegExp(`([${cjkCharRange}])\\*\\*(?=[${cjkStrongBoundaryPunctuationClass}])`, "g");
+const cjkStrongCloseBoundaryPattern = new RegExp(`([${cjkStrongBoundaryPunctuationClass}])\\*\\*(?=[${cjkCharRange}])`, "g");
+
+const splitFencedCodeSegments = (markdownValue: string) => {
+    const parts = markdownValue.split(/(\r?\n)/);
+    const segments: MarkdownSegment[] = [];
+    let buffer = "";
+    let activeFence = "";
+    let locked = false;
+
+    const flush = () => {
+        if (buffer) {
+            segments.push({value: buffer, locked});
+            buffer = "";
+        }
+    };
+
+    parts.forEach((part) => {
+        if (/^\r?\n$/.test(part)) {
+            buffer += part;
+            return;
+        }
+        const fenceMatch = part.trim().match(fencedCodeLinePattern);
+        if (fenceMatch && (!activeFence || fenceMatch[1] === activeFence)) {
+            if (!activeFence) {
+                flush();
+                activeFence = fenceMatch[1];
+                locked = true;
+                buffer = part;
+                return;
+            }
+            buffer += part;
+            flush();
+            activeFence = "";
+            locked = false;
+            return;
+        }
+        buffer += part;
+    });
+    flush();
+    return segments;
+};
+
+const transformOutsideInlineCode = (markdownValue: string, transform: (value: string) => string) => {
+    let output = "";
+    let lastIndex = 0;
+    markdownValue.replace(inlineCodePattern, (match: string, _ticks: string, _code: string, offset: number) => {
+        output += transform(markdownValue.slice(lastIndex, offset));
+        output += match;
+        lastIndex = offset + match.length;
+        return match;
+    });
+    return output + transform(markdownValue.slice(lastIndex));
+};
+
+const transformOutsideMarkdownCode = (markdownValue: string, transform: (value: string) => string) => {
+    return splitFencedCodeSegments(markdownValue)
+        .map((segment) => segment.locked ? segment.value : transformOutsideInlineCode(segment.value, transform))
+        .join("");
+};
+
+const escapeMathSource = (value: string) => {
+    return value
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+};
+
+const createMathPlaceholder = (expression: string, displayMode: boolean, tokens: MarkdownMathToken[]) => {
+    const attrName = displayMode ? "data-zrlog-math-block" : "data-zrlog-math-inline";
+    const tagName = displayMode ? "div" : "span";
+    const placeholder = `<${tagName} ${attrName}="${tokens.length}"></${tagName}>`;
+    tokens.push({placeholder, expression, displayMode});
+    return placeholder;
+};
+
+const extractMarkdownMath = (markdownValue: string) => {
+    const tokens: MarkdownMathToken[] = [];
+    const markdown = transformOutsideMarkdownCode(markdownValue, (value) => {
+        const withBlockMath = value.replace(texBlockPattern, (_match, expression: string) => {
+            return createMathPlaceholder(expression, true, tokens);
+        });
+        return withBlockMath.replace(texInlinePattern, (_match, expression: string) => {
+            return createMathPlaceholder(expression, false, tokens);
+        });
+    });
+    return {markdown, tokens};
+};
+
+const renderMathToken = (token: MarkdownMathToken) => {
+    try {
+        return katex.renderToString(token.expression, {
+            displayMode: token.displayMode,
+            throwOnError: false,
+            output: "html",
+        });
+    } catch (e) {
+        const source = token.displayMode ? `$$${token.expression}$$` : `$${token.expression}$`;
+        return escapeMathSource(source);
+    }
+};
+
+const restoreMarkdownMath = (html: string, tokens: MarkdownMathToken[]) => {
+    return tokens.reduce((value, token) => {
+        return value.split(token.placeholder).join(renderMathToken(token));
+    }, html);
+};
+
+const addCjkStrongBoundaryMarkers = (markdownValue: string) => {
+    return transformOutsideMarkdownCode(markdownValue, (value) => {
+        return value
+            .replace(cjkStrongOpenBoundaryPattern, `$1${cjkStrongBoundaryMarker}**`)
+            .replace(cjkStrongCloseBoundaryPattern, `$1**${cjkStrongBoundaryMarker}`);
+    });
+};
+
+const renderMarkdownToHtml = (markdownValue: string) => {
+    const mathResult = extractMarkdownMath(markdownValue);
+    const markdown = addCjkStrongBoundaryMarkers(mathResult.markdown);
+    const html = marked(markdown) as string;
+    return restoreMarkdownMath(html, mathResult.tokens).split(cjkStrongBoundaryMarker).join("");
+};
+
 const markdownRenderToDiv = (markdownValue: string) => {
-    const text = marked(markdownValue) as string;
+    const text = renderMarkdownToHtml(markdownValue);
     // 创建离屏容器（不挂载到页面）
     const container = document.createElement("div");
     container.innerHTML = text;
@@ -305,7 +449,7 @@ const withLinkPreviewCards = async (markdownValue: string, options?: MarkdownRen
 export const markdownToHtml = async (markdownValue: string, options?: MarkdownRenderOptions) => {
     const container = markdownRenderToDiv(await withLinkPreviewCards(markdownValue, options));
     await hydrateCodeBlocks(container);
-    return renderTex(container.innerHTML);
+    return container.innerHTML;
 };
 
 export const markdownToHtmlSyncWithCallback = (markdownValue: string, onSuccess: (realHtmlStr: string) => void, options?: MarkdownRenderOptions) => {
@@ -313,8 +457,8 @@ export const markdownToHtmlSyncWithCallback = (markdownValue: string, onSuccess:
     withLinkPreviewCards(markdownValue, options).then((value) => {
         const realContainer = markdownRenderToDiv(value);
         hydrateCodeBlocks(realContainer).then(() => {
-            onSuccess(renderTex(realContainer.innerHTML));
+            onSuccess(realContainer.innerHTML);
         });
     });
-    return renderTex(container.innerHTML);
+    return container.innerHTML;
 };
