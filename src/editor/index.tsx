@@ -126,7 +126,6 @@ const Editor: FunctionComponent<ZrLogEditorProps> = ({
             const gutters = editorRef.current.dom.querySelector(".cm-gutters-before") as HTMLElement;
             if (gutters) {
                 const newWidth = gutters.offsetWidth;
-                console.log("当前行号宽度:", newWidth);
                 if (guttersWidth == newWidth) {
                     return;
                 }

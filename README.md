@@ -2,7 +2,7 @@
 
 <div align="center">
 
-一个功能强大、现代化的 Markdown 编辑器，基于 React + CodeMirror + Marked 构建。
+一个支持编辑、预览和扩展集成的 Markdown 编辑器，基于 React + CodeMirror + Marked 构建。
 
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![Node Version](https://img.shields.io/badge/node-%3E%3D18.9.0-brightgreen)](https://nodejs.org/)
@@ -18,16 +18,16 @@
 
 ## ✨ 特性
 
-- 📝 **实时预览** - 即时 Markdown 渲染，所见即所得
+- 📝 **实时预览** - 编辑时同步渲染 Markdown
 - 🎨 **语法高亮** - 支持多种编程语言的代码高亮显示
-- 🤖 **AI 辅助写作** - 内置 AI 写作助手，提升创作效率
+- 🤖 **AI 辅助写作** - 可接入文章助手处理选中文本和上下文
 - 📊 **数学公式** - 支持 KaTeX 数学公式渲染
-- 🔄 **滚动同步** - 编辑器与预览面板智能同步滚动
+- 🔄 **滚动同步** - 编辑器与预览面板同步滚动
 - 📷 **图片上传** - 支持粘贴和拖拽上传图片及视频
 - 🎯 **流程图支持** - 支持 flowchart.js 流程图和时序图
-- 📱 **响应式设计** - 完美适配桌面和移动设备
+- 📱 **响应式设计** - 适配桌面和移动端
 - 🌐 **国际化** - 支持多语言界面
-- ⚡ **高性能** - 基于现代前端技术栈，运行流畅
+- ⚡ **编辑响应** - 基于 CodeMirror 6 处理长文本编辑
 
 ## 🏗️ 架构
 
@@ -54,12 +54,15 @@ npm install zrlog-editor
 
 ```javascript
 import { MarkedEditor } from 'zrlog-editor';
+import { useState } from 'react';
 
 function App() {
+  const [markdown, setMarkdown] = useState('# Hello World');
+
   return (
-    <MarkedEditor 
-      value="# Hello World"
-      onChange={(value) => console.log(value)}
+    <MarkedEditor
+      value={markdown}
+      onChange={({ value }) => setMarkdown(value)}
     />
   );
 }
