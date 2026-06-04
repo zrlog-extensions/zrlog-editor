@@ -140,7 +140,7 @@ const texInlinePattern = /(?<!\$)\$(.+?)\$(?!\$)/g;
 const cjkStrongBoundaryMarker = "<!--zrlog-cjk-strong-->";
 const cjkCharRange = "\\u3400-\\u4DBF\\u4E00-\\u9FFF\\uF900-\\uFAFF\\u3040-\\u30FF\\uAC00-\\uD7AF";
 
-const escapeRegexCharClass = (value: string) => value.replace(/[\\\]\-\^]/g, "\\$&");
+const escapeRegexCharClass = (value: string) => value.replace(/[\\\]\-^]/g, "\\$&");
 const cjkStrongBoundaryPunctuationClass = escapeRegexCharClass("'\"“”‘’「」『』（）()《》〈〉【】[]{}，。！？；：、,.!?;:");
 const cjkStrongOpenBoundaryPattern = new RegExp(`([${cjkCharRange}])\\*\\*(?=[${cjkStrongBoundaryPunctuationClass}])`, "g");
 const cjkStrongCloseBoundaryPattern = new RegExp(`([${cjkStrongBoundaryPunctuationClass}])\\*\\*(?=[${cjkCharRange}])`, "g");
