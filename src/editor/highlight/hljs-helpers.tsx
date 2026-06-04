@@ -4,10 +4,13 @@ import {marked} from "marked";
 
 const renderer = new marked.Renderer();
 
-const md5 = (text: string) => {
-    //FIXME
-    return text;
-}
+const createStableId = (text: string) => {
+    let hash = 0;
+    for (let i = 0; i < text.length; i += 1) {
+        hash = (hash * 31 + text.charCodeAt(i)) >>> 0;
+    }
+    return hash.toString(36);
+};
 
 hljs.registerLanguage("shell", shell);
 
@@ -28,23 +31,23 @@ renderer.code = function ({text, lang}) {
         const highlighted = hljs.highlight(text, {language: validLang}).value;
         return `<div class="code-block-wrapper" data-code="${encodeURIComponent(text)}"><pre><code class="hljs language-${validLang}">${highlighted}</code></pre></div>`;
     } else if (lang === "flow") {
-        const id = "flow_" + md5(text);
+        const id = "flow_" + createStableId(text);
         // 返回占位 div
-        return `<div id="${id}"  data-code="${encodeURIComponent(text)}" class="flow"></div>`;
+        return `<div id="${id}" data-code="${encodeURIComponent(text)}" class="flow"></div>`;
     } else if (lang === "seq") {
-        const id = "seq_" + md5(text);
+        const id = "seq_" + createStableId(text);
         // 返回占位 div
         return `<div id="${id}" data-code="${encodeURIComponent(text)}" class="seq"></div>`;
     } else if (lang === "katex") {
-        const id = "katex_" + md5(text);
+        const id = "katex_" + createStableId(text);
         // 返回占位 div
         return `<div id="${id}" data-code="${encodeURIComponent(text)}" class="katex"></div>`;
     } else if (lang === "latex") {
-        const id = "latex_" + md5(text);
+        const id = "latex_" + createStableId(text);
         // 返回占位 div
         return `<div id="${id}" data-code="${encodeURIComponent(text)}" class="katex"></div>`;
     } else if (lang === "math") {
-        const id = "math_" + md5(text);
+        const id = "math_" + createStableId(text);
         // 返回占位 div
         return `<div id="${id}" data-code="${encodeURIComponent(text)}" class="katex"></div>`;
     }
