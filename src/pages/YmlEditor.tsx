@@ -15,6 +15,8 @@ type TestMarkdownEditorProps = {
     dark: boolean
 }
 
+const editorHeight = "clamp(320px, calc(100vh - 260px), 560px)";
+
 const markdown = "- just: write some\n" +
     "- yaml: \n" +
     "  - [here, and]\n" +
@@ -51,15 +53,16 @@ const YmlEditor: FunctionComponent<TestMarkdownEditorProps> = ({dark}) => {
         }
     } as EditorConfig
 
-    return <Layout style={{height: "100vh", padding: 16}}>
-        <Title level={2} style={{textAlign: "center", paddingBottom: 32}}>Yml Editor</Title>
+    return <Layout style={{minHeight: "100vh", padding: 16, boxSizing: "border-box"}}>
+        <Title level={2} style={{textAlign: "center", margin: 0, paddingBottom: 16}}>Yml Editor</Title>
         <Card title={""} styles={{
             body: {
                 padding: 0,
-                overflow: "hidden"
+                overflow: "hidden",
+                position: "relative",
             }
         }}>
-            <Editor height={518} onChange={(e) => {
+            <Editor height={editorHeight} onChange={(e) => {
                 setValue(e.value)
             }} fullscreen={false} value={markdown}
                    axiosInstance={axios.create()}
@@ -74,7 +77,7 @@ const YmlEditor: FunctionComponent<TestMarkdownEditorProps> = ({dark}) => {
                                                                   dark={dark}/>
             }
         </Card>
-        <Footer dark={dark}/>
+        <Footer/>
     </Layout>
 }
 export default YmlEditor;

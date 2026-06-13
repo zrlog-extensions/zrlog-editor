@@ -2,6 +2,8 @@ import {marked} from "marked";
 import HtmlPreviewPanel from "../html-preview-panel";
 import StyledPreview from "../styles/styled-preview";
 import {FunctionComponent} from "react";
+import packageJson from "../../../package.json";
+import {theme} from "antd";
 
 const helpMd = `
 ### Markdown语法教程 (Markdown syntax tutorial)
@@ -31,10 +33,21 @@ type MarkdownHelpProps = {
 }
 
 const MarkdownHelp: FunctionComponent<MarkdownHelpProps> = ({dark}) => {
+    const {token} = theme.useToken();
     const helpHtml = marked(helpMd);
     return (
         <StyledPreview dark={dark} style={{borderRadius: 8}}>
             <HtmlPreviewPanel dark={dark} htmlContent={helpHtml as string}/>
+            <div style={{
+                borderTop: `${token.colorBorderSecondary} solid 1px`,
+                color: token.colorTextTertiary,
+                fontSize: 12,
+                marginTop: 8,
+                padding: "8px 12px 4px",
+                textAlign: "right",
+            }}>
+                ZrLog Editor {packageJson.version}
+            </div>
         </StyledPreview>
     );
 };

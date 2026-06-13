@@ -38,8 +38,10 @@ const EditorStatusBar: FunctionComponent<EditorStatusBarProps> = ({
             left: 0,
             width: "100%",
             bottom: 0,
-            backgroundColor: fullScreen ? getBgColor(dark) : "transparent",
+            backgroundColor: getBgColor(dark),
             color: getTextColor(dark),
+            zIndex: 1,
+            boxSizing: "border-box",
         }}>
             <Divider style={{margin: 0, padding: 0}}/>
             <div

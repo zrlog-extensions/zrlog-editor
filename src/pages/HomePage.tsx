@@ -15,6 +15,8 @@ type TestMarkdownEditorProps = {
     dark: boolean
 }
 
+const editorHeight = "clamp(320px, calc(100vh - 260px), 560px)";
+
 const markdown = "### Editor\n" +
     "\n" +
     "<div align=\"center\">\n" +
@@ -80,14 +82,16 @@ const HomePage: FunctionComponent<TestMarkdownEditorProps> = ({dark}) => {
         }
     } as EditorConfig
 
-    return <Layout style={{height: "100vh", padding: 16}}>
-        <Title level={2} style={{textAlign: "center", paddingBottom: 32}}>Markdown Editor</Title>
+    return <Layout style={{minHeight: "100vh", padding: 16, boxSizing: "border-box"}}>
+        <Title level={2} style={{textAlign: "center", margin: 0, paddingBottom: 16}}>Markdown Editor</Title>
         <Card title={""} styles={{
             body: {
-                padding: 0
+                padding: 0,
+                overflow: "hidden",
+                position: "relative",
             }
         }}>
-            <Editor height={518} onChange={(e) => {
+            <Editor height={editorHeight} onChange={(e) => {
                 setValue(e.value)
             }} fullscreen={false} value={markdown}
                     axiosInstance={axios.create()}
@@ -102,7 +106,7 @@ const HomePage: FunctionComponent<TestMarkdownEditorProps> = ({dark}) => {
                                                                   dark={dark}/>
             }
         </Card>
-        <Footer dark={dark}/>
+        <Footer/>
     </Layout>
 }
 export default HomePage;

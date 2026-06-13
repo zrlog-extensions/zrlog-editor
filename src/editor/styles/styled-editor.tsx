@@ -1,8 +1,9 @@
 import styled from "styled-components";
-import {getActiveLineBgColor, getBgColor, getBorderColor, getTextColor} from "../editor-helpers";
+import {getActiveLineBgColor, getBgColor, getBorderColor, getGutterBgColor, getTextColor} from "../editor-helpers";
 
 export const StyledEditor = styled("div")<{ mainColor: string, dark: boolean }>(({mainColor, dark}) => {
     const bgColor = getBgColor(dark);
+    const gutterBgColor = getGutterBgColor(dark);
     const activeLineBgColor = getActiveLineBgColor(dark);
     const textColor = getTextColor(dark);
 
@@ -32,8 +33,18 @@ export const StyledEditor = styled("div")<{ mainColor: string, dark: boolean }>(
         ".cm-scroller": {
             fontFamily:
                 '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans",sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
+            height: "100%",
         },
-        ".cm-gutters": {userSelect: "none"},
+        ".cm-gutters": {
+            userSelect: "none",
+            alignSelf: "stretch",
+            minHeight: "100%",
+            backgroundColor: gutterBgColor,
+            borderRight: `${getBorderColor(dark)} solid 1px`,
+        },
+        ".cm-gutter": {
+            minHeight: "100%",
+        },
         ".cm-panel.cm-search": {fontSize: "14px !important"},
         ".cm-panels.cm-panels-bottom": {borderTop: "none"},
         ".cm-panel": {
@@ -74,7 +85,7 @@ export const StyledEditor = styled("div")<{ mainColor: string, dark: boolean }>(
             borderRadius: 4,
         },
         ".editor-dark .cm-scroller": {backgroundColor: `${bgColor} !important`},
-        ".editor-dark .cm-gutters": {backgroundColor: `${bgColor} !important`},
+        ".editor-dark .cm-gutters": {backgroundColor: `${gutterBgColor} !important`},
         ".editor-dark .cm-activeLine": {backgroundColor: activeLineBgColor},
         ".editor-dark .cm-activeLineGutter": {backgroundColor: activeLineBgColor},
         ".editor-dark .cm-panel": {

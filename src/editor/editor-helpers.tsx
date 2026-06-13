@@ -3,7 +3,11 @@ export const getBorderColor = (dark: boolean) => {
 };
 
 export const getBgColor = (dark: boolean) => {
-    return dark ? `var(--ant-color-bg-container, #141414)` : "#f3f3f3";
+    return dark ? `var(--ant-color-bg-container, #141414)` : `var(--ant-color-bg-container, #ffffff)`;
+};
+
+export const getGutterBgColor = (dark: boolean) => {
+    return dark ? getBgColor(dark) : `var(--ant-color-fill-quaternary, #f7f7f7)`;
 };
 
 export const getActiveLineBgColor = (dark: boolean) => {
