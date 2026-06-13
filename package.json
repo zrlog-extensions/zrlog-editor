@@ -76,5 +76,6 @@
     "package.json",
     "editor-changelog.md"
   ],
-  "main": "dist/editor/marked-editor"
+  "main": "dist/editor/marked-editor",
+  "types": "dist/editor/marked-editor.d.ts"
 }
