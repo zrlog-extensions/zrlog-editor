@@ -3,5 +3,13 @@ export const getBorderColor = (dark: boolean) => {
 };
 
 export const getBgColor = (dark: boolean) => {
-    return dark ? `black` : "#f3f3f3";
+    return dark ? `var(--ant-color-bg-container, #141414)` : "#f3f3f3";
+};
+
+export const getActiveLineBgColor = (dark: boolean) => {
+    return dark ? `var(--ant-color-fill-quaternary, rgba(255, 255, 255, 0.04))` : "rgba(0, 0, 0, 0.04)";
+};
+
+export const getTextColor = (dark: boolean) => {
+    return dark ? `var(--ant-color-text, rgba(255, 255, 255, 0.85))` : "inherit";
 };

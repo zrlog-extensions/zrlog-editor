@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { CSSProperties, forwardRef, PropsWithChildren } from "react";
+import {getBgColor, getTextColor} from "../editor-helpers";
 
 const lightCss = `
     .markdown-body strong {
@@ -328,9 +329,15 @@ type StyledPreviewProps = PropsWithChildren & {
 
 const StyledPreview = forwardRef<HTMLDivElement, StyledPreviewProps>(({ dark, style, children, ...rest }, ref) => {
     const Comp = dark ? DarkStylePreview : LightStyledPreview;
+    const darkStyle = dark
+        ? {
+              backgroundColor: getBgColor(dark),
+              color: getTextColor(dark),
+          }
+        : {};
 
     return (
-        <Comp ref={ref} style={style} {...rest}>
+        <Comp ref={ref} style={{...darkStyle, ...style}} {...rest}>
             {children}
         </Comp>
     );

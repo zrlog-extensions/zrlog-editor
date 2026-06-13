@@ -1,12 +1,28 @@
 import styled from "styled-components";
-import {getBorderColor} from "../editor-helpers";
+import {getActiveLineBgColor, getBgColor, getBorderColor, getTextColor} from "../editor-helpers";
 
 export const StyledEditor = styled("div")<{ mainColor: string, dark: boolean }>(({mainColor, dark}) => {
+    const bgColor = getBgColor(dark);
+    const activeLineBgColor = getActiveLineBgColor(dark);
+    const textColor = getTextColor(dark);
 
     return {
+        backgroundColor: bgColor,
+        overflow: "hidden",
+        color: textColor,
+        ".editor-dark": {
+            backgroundColor: bgColor,
+            overflow: "hidden",
+        },
+        ".editor-dark > div": {
+            backgroundColor: bgColor,
+        },
         ".cm-editor.cm-focused": {
             outline: "none !important",
             boxShadow: "none !important",
+        },
+        ".editor-dark .cm-editor": {
+            backgroundColor: bgColor,
         },
         ".preview": {
             overflow: "auto",
@@ -57,10 +73,12 @@ export const StyledEditor = styled("div")<{ mainColor: string, dark: boolean }>(
             height: 26,
             borderRadius: 4,
         },
-        ".editor-dark .cm-scroller": {backgroundColor: "#1d1d1d"},
-        ".editor-dark .cm-gutters": {backgroundColor: "#1f1f1f"},
+        ".editor-dark .cm-scroller": {backgroundColor: `${bgColor} !important`},
+        ".editor-dark .cm-gutters": {backgroundColor: `${bgColor} !important`},
+        ".editor-dark .cm-activeLine": {backgroundColor: activeLineBgColor},
+        ".editor-dark .cm-activeLineGutter": {backgroundColor: activeLineBgColor},
         ".editor-dark .cm-panel": {
-            backgroundColor: "#1f1f1f",
+            backgroundColor: bgColor,
         },
         ".editor-dark .cm-panel.cm-search [name=close]": {
             color: "white",

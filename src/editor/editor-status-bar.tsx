@@ -2,6 +2,7 @@ import {FunctionComponent, ReactNode} from "react";
 import RubbishText from "./RubbishText";
 import {getEditorRes} from "./lang/editor-lang";
 import {Divider} from "antd";
+import {getBgColor, getTextColor} from "./editor-helpers";
 
 export type EditorStatusBarInfo = {
     contentWordsLength: number;
@@ -27,6 +28,7 @@ const EditorStatusBar: FunctionComponent<EditorStatusBarProps> = ({
                                                                       offline,
                                                                       rubbish,
                                                                       lastUpdateDate,
+                                                                      dark,
                                                                       extra,
                                                                       extraPlacement = "right",
                                                                   }) => {
@@ -36,6 +38,8 @@ const EditorStatusBar: FunctionComponent<EditorStatusBarProps> = ({
             left: 0,
             width: "100%",
             bottom: 0,
+            backgroundColor: getBgColor(dark),
+            color: getTextColor(dark),
         }}>
             <Divider style={{margin: 0, padding: 0}}/>
             <div
