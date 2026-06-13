@@ -29,9 +29,10 @@ const EditorStatusBar: FunctionComponent<EditorStatusBarProps> = ({
                                                                       rubbish,
                                                                       lastUpdateDate,
                                                                       dark,
-                                                                      extra,
-                                                                      extraPlacement = "right",
-                                                                  }) => {
+                                                                  extra,
+                                                                  extraPlacement = "right",
+                                                              }) => {
+    const bottomRadius = fullScreen ? 0 : "var(--ant-border-radius-lg, 8px)";
     return (
         <div style={{
             position: fullScreen ? "fixed" : "absolute",
@@ -40,6 +41,9 @@ const EditorStatusBar: FunctionComponent<EditorStatusBarProps> = ({
             bottom: 0,
             backgroundColor: getBgColor(dark),
             color: getTextColor(dark),
+            borderBottomLeftRadius: bottomRadius,
+            borderBottomRightRadius: bottomRadius,
+            overflow: "hidden",
         }}>
             <Divider style={{margin: 0, padding: 0}}/>
             <div
