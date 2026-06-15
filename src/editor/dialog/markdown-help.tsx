@@ -2,8 +2,8 @@ import {marked} from "marked";
 import HtmlPreviewPanel from "../html-preview-panel";
 import StyledPreview from "../styles/styled-preview";
 import {FunctionComponent} from "react";
-import packageJson from "../../../package.json";
 import {theme} from "antd";
+import {editorVersion} from "../editor-version";
 
 const helpMd = `
 ### Markdown语法教程 (Markdown syntax tutorial)
@@ -46,7 +46,7 @@ const MarkdownHelp: FunctionComponent<MarkdownHelpProps> = ({dark}) => {
                 padding: "8px 12px 4px",
                 textAlign: "right",
             }}>
-                ZrLog Editor {packageJson.version}
+                ZrLog Editor {editorVersion}
             </div>
         </StyledPreview>
     );
