@@ -29,7 +29,7 @@ const HtmlPreviewPanel: FunctionComponent<EditorPreviewProps> = ({
             ref.current.innerHTML = htmlContent;
             hydrateReactComponents(ref.current);
         }
-    }, [htmlContent]);
+    }, [htmlContent, dark]);
 
     const handleInput = () => {
         if (onContentChange && ref.current) {
