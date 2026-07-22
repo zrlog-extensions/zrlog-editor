@@ -113,7 +113,7 @@ function App() {
 
 如果你在使用过程中遇到问题，欢迎通过以下方式反馈：
 
-- 🐛 [提交 Issue](https://github.com/zrlog-extensions/zrlog-editor/issues/new) - 报告 bug 或提出新功能建议
+- 🐛 [提交 Issue](https://github.com/zrlog/zrlog-editor/issues/new) - 报告 bug 或提出新功能建议
 
 ## 📊 变更日志
 
