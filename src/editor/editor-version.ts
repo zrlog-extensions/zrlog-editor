@@ -1,1 +1,1 @@
-export const editorVersion = "2.1.31-SNAPSHOT";
+export const editorVersion = "2.1.31";
