@@ -1,4 +1,5 @@
 import AIDrawer, {getAiDrawerOpen} from "./AIDrawer";
+import {Link} from "react-router-dom";
 import {AIProviderType, EditorUser} from "../type";
 import {
     CSSProperties,
@@ -373,7 +374,7 @@ const AIButton: FunctionComponent<AIButtonProps> = ({
                 title={getEditorRes("ai").askConfig}
                 getPopupContainer={getContainer}
                 getTooltipContainer={getContainer}
-                okText={<a href={configUrl ? configUrl : "#miss"}>{getEditorRes("setting")}</a>}
+                okText={<Link to={configUrl ? configUrl : "#miss"}>{getEditorRes("setting")}</Link>}
             >
                 {renderTrigger()}
             </Popconfirm>
