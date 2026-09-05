@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "lib": ["es2020"],
+    "types": [],
+    "target": "es2020",
+    "module": "commonjs",
+    "rootDir": "src/markdown",
+    "outDir": "dist/markdown",
+    "incremental": false
+  },
+  "include": ["src/markdown/**/*.ts"]
+}

@@ -1,5 +1,11 @@
 ### editor 维护记录
 
+### 2.1.32
+
+- Add a standalone Markdown bundle for GraalJS/Polyglot without browser globals.
+- Share code highlighting, CJK strong handling, and KaTeX rendering with the editor.
+- Publish a versioned Markdown min.js alongside the editor package.
+
 #### dependency upgraded
 
 - marked (to 2020 version)

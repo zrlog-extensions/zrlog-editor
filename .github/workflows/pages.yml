@@ -32,6 +32,9 @@ jobs:
       - name: Type check
         run: yarn type-check
 
+      - name: Test standalone Markdown bundle
+        run: yarn test:markdown
+
       - name: Build static site
         run: yarn pages
 

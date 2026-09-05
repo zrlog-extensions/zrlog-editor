@@ -32,7 +32,9 @@
     "lint": "yarn type-check",
     "start": "export PORT=3030 && craco start",
     "type-check": "tsc --project tsconfig.json --pretty --noEmit",
-    "build": "tsc",
+    "build": "tsc && npm run build:markdown",
+    "build:markdown": "tsc --project tsconfig-markdown.json && node shell/build-markdown.cjs",
+    "test:markdown": "npm run build:markdown && node --test tests/markdown.test.cjs",
     "pages": "craco build",
     "test": "craco test"
   },
@@ -48,11 +50,13 @@
     "@typescript-eslint/typescript-estree": "8.38.0",
     "cross-env": "7.0.3",
     "husky": "7.0.4",
+    "jsdom": "16.7.0",
     "lint-staged": "11.1.2",
     "node": "18.9.0",
     "prettier": "2.3.2",
     "react-scripts": "5.0.1",
-    "typescript": "5.8.3"
+    "typescript": "5.8.3",
+    "webpack": "5.100.2"
   },
   "browserslist": {
     "production": [
